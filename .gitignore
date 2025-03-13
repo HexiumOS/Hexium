@@ -1,0 +1,5 @@
+/limine
+/log
+/ovmf
+*.iso
+*.hdd

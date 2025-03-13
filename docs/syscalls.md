@@ -1,4 +1,4 @@
-# Syscall API for Infinity oS
+# Syscall API for Infinity OS
 
 ## The basics
 
@@ -15,7 +15,7 @@ The syscall arguments will be passed in this order of registers:
 
 ## Syscalls
 
-| Name  | Number (`rax`) | Description                 | Arg 0\n(`rdi`)         | Arg 1\n(`rsi`)     | Arg 2\n(`rdx`)  | Arg 3\n(`r10`) | Arg 4\n(`r8`) | Arg 5\n(`r9`)     |
+| Name  | Number (`rax`) | Description                 | Arg 0\n(`rdi`)           | Arg 1\n(`rsi`)       | Arg 2\n(`rdx`)    | Arg 3\n(`r10`)   | Arg 4\n(`r8`)   | Arg 5\n(`r9`)       |
 |-------|----------------|-----------------------------|--------------------------|----------------------|-------------------|------------------|-----------------|---------------------|
 | Read  | 0              | Read from a file descriptor | unsigned int fd          | char *buf            | size_t count      |                  |                 |                     |
 | Write | 1              | Write to a file descriptor  | unsigned int fd          | const char *buf      | size_t count      |                  |                 |                     |

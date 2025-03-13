@@ -5,7 +5,7 @@ Welcome to **InfinityOS**, an experimental operating system written in Rust. Thi
 ## **🛠️ Features**
 
 - :white_check_mark: Limine Bootloader
-- :x: Flanterm terminal
+- :white_check_mark: Flanterm terminal
 - :x: Global Descriptor Table
 - :x: Interrupts
 - :x: Keyboard Driver

@@ -4,6 +4,7 @@
 use core::arch::asm;
 
 pub mod boot;
+pub mod devices;
 pub mod drivers;
 pub mod interrupts;
 pub mod log;

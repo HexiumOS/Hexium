@@ -3,14 +3,14 @@
 use core::arch::asm;
 
 pub mod boot;
-pub mod base;
+pub mod log;
 pub mod utils;
 pub mod writer;
 
 pub fn init(framebuffer: limine::framebuffer::Framebuffer) {
     writer::init(framebuffer);
 
-    base::banner::print();
+    info!("Welcome to Infinity OS\n");
 }
 
 pub fn hlt_loop() -> ! {

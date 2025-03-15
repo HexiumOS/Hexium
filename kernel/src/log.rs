@@ -40,12 +40,12 @@ macro_rules! trace {
 #[macro_export]
 macro_rules! debug {
     ($($arg:tt)*) => {
-        #[cfg(not(debug_assertions))]
+        #[cfg(debug_assertions)]
         {
             $crate::log!($crate::log::LogLevel::Debug, $($arg)*);
         }
         
-        #[cfg(debug_assertions)]
+        #[cfg(not(debug_assertions))]
         {}
     };
 }

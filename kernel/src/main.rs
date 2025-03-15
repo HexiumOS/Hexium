@@ -1,7 +1,7 @@
 #![no_std]
 #![no_main]
 
-use infinity_os::{hlt_loop, init, boot};
+use infinity_os::{boot, hlt_loop, init, panic_log};
 
 #[unsafe(no_mangle)]
 unsafe extern "C" fn kmain() -> ! {
@@ -17,6 +17,7 @@ unsafe extern "C" fn kmain() -> ! {
 }
 
 #[panic_handler]
-fn rust_panic(_info: &core::panic::PanicInfo) -> ! {
+fn rust_panic(info: &core::panic::PanicInfo) -> ! {
+    panic_log!("{}", info);
     hlt_loop();
 }

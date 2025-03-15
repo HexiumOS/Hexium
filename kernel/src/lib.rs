@@ -1,14 +1,18 @@
 #![no_std]
+#![feature(abi_x86_interrupt)]
 
 use core::arch::asm;
 
 pub mod boot;
+pub mod interrupts;
 pub mod log;
 pub mod utils;
 pub mod writer;
 
 pub fn init(framebuffer: limine::framebuffer::Framebuffer) {
     writer::init(framebuffer);
+
+    interrupts::idt::init();
 
     info!("Welcome to Infinity OS\n");
 }

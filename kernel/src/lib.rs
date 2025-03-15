@@ -4,6 +4,7 @@
 use core::arch::asm;
 
 pub mod boot;
+pub mod drivers;
 pub mod interrupts;
 pub mod log;
 pub mod utils;
@@ -11,9 +12,7 @@ pub mod writer;
 
 pub fn init(framebuffer: limine::framebuffer::Framebuffer) {
     writer::init(framebuffer);
-
-    interrupts::gdt::init();
-    interrupts::idt::init();
+    interrupts::init();
 
     info!("Welcome to Infinity OS\n");
 }

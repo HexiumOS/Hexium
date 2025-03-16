@@ -8,6 +8,7 @@ pub mod devices;
 pub mod drivers;
 pub mod interrupts;
 pub mod log;
+pub mod memory;
 pub mod utils;
 pub mod writer;
 

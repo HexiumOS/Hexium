@@ -12,8 +12,8 @@ pub mod memory;
 pub mod utils;
 pub mod writer;
 
-pub fn init(framebuffer: limine::framebuffer::Framebuffer) {
-    writer::init(framebuffer);
+pub fn init() {
+    writer::init();
     interrupts::init();
 
     info!("Welcome to Infinity OS\n");

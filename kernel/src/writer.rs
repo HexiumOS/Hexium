@@ -1,38 +1,44 @@
+use crate::{utils::types::option_to_c_void, boot};
 use core::fmt;
 use core::ptr;
-use crate::utils::types::option_to_c_void;
 use lazy_static::lazy_static;
 use spin::Mutex;
 
-pub fn init(framebuffer: limine::framebuffer::Framebuffer) {
-    *FLANTERM_CTX.lock() = FlantermContextWrapper::new(unsafe { flanterm::sys::flanterm_fb_init(
-        None,
-        None,
-        framebuffer.addr() as *mut u32,
-        framebuffer.width() as usize,
-        framebuffer.height() as usize,
-        framebuffer.pitch() as usize,
-        framebuffer.red_mask_size(),
-        framebuffer.red_mask_shift(),
-        framebuffer.green_mask_size(),
-        framebuffer.green_mask_shift(),
-        framebuffer.blue_mask_size(),
-        framebuffer.blue_mask_shift(),
-        ptr::null_mut(),
-        ptr::null_mut(),
-        ptr::null_mut(),
-        ptr::null_mut(),
-        ptr::null_mut(),
-        ptr::null_mut(),
-        ptr::null_mut(),
-        option_to_c_void::<fn()>(None),
-        0,
-        0,
-        1,
-        None::<fn()>.is_some() as usize,
-        None::<fn()>.is_some() as usize,
-        None::<fn()>.is_some() as usize,
-    ) });
+pub fn init() {
+    if let Some(framebuffer_response) = boot::FRAMEBUFFER_REQUEST.get_response() {
+        if let Some(framebuffer) = framebuffer_response.framebuffers().next() {
+            *FLANTERM_CTX.lock() = FlantermContextWrapper::new(unsafe {
+                flanterm::sys::flanterm_fb_init(
+                    None,
+                    None,
+                    framebuffer.addr() as *mut u32,
+                    framebuffer.width() as usize,
+                    framebuffer.height() as usize,
+                    framebuffer.pitch() as usize,
+                    framebuffer.red_mask_size(),
+                    framebuffer.red_mask_shift(),
+                    framebuffer.green_mask_size(),
+                    framebuffer.green_mask_shift(),
+                    framebuffer.blue_mask_size(),
+                    framebuffer.blue_mask_shift(),
+                    ptr::null_mut(),
+                    ptr::null_mut(),
+                    ptr::null_mut(),
+                    ptr::null_mut(),
+                    ptr::null_mut(),
+                    ptr::null_mut(),
+                    ptr::null_mut(),
+                    option_to_c_void::<fn()>(None),
+                    0,
+                    0,
+                    1,
+                    None::<fn()>.is_some() as usize,
+                    None::<fn()>.is_some() as usize,
+                    None::<fn()>.is_some() as usize,
+                )
+            });
+        }
+    }
 }
 
 pub struct FlantermContextWrapper(*mut flanterm::sys::flanterm_context);

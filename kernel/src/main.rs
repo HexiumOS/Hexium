@@ -7,11 +7,7 @@ use infinity_os::{boot, hlt_loop, init, panic_log};
 unsafe extern "C" fn kmain() -> ! {
     assert!(boot::BASE_REVISION.is_supported());
 
-    if let Some(framebuffer_response) = boot::FRAMEBUFFER_REQUEST.get_response() {
-        if let Some(framebuffer) = framebuffer_response.framebuffers().next() {
-            init(framebuffer);
-        }
-    }
+    init();
 
     hlt_loop();
 }

@@ -15,6 +15,7 @@ pub mod writer;
 pub fn init() {
     writer::init();
     interrupts::init();
+    memory::init();
 
     info!("Welcome to Infinity OS\n");
 }

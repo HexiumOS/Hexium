@@ -1,6 +1,6 @@
-# Contributing to InfinityOS
+# Contributing to Hexium OS
 
-Thank you for your interest in contributing to InfinityOS! We welcome contributions from the community to help improve and evolve the project. This document will guide you through the process of contributing to the project.
+Thank you for your interest in contributing to Hexium OS! We welcome contributions from the community to help improve and evolve the project. This document will guide you through the process of contributing to the project.
 
 ## Table of Contents
 
@@ -22,7 +22,7 @@ By participating in this project, you agree to follow the [Code of Conduct](./CO
 
 If you find a bug, please report it using the following steps:
 
-1. Check the existing [issues](https://github.com/yourusername/InfinityOS/issues) to see if the bug has already been reported.
+1. Check the existing [issues](https://github.com/HexiumOS/Hexium/issues) to see if the bug has already been reported.
 2. If the issue is not listed, create a new issue with a detailed description of the bug, including:
    - Steps to reproduce
    - Expected behavior
@@ -33,7 +33,7 @@ If you find a bug, please report it using the following steps:
 
 We welcome suggestions for new features or improvements! To suggest an enhancement:
 
-1. Check the existing [issues](https://github.com/yourusername/InfinityOS/issues) to ensure it hasn't already been suggested.
+1. Check the existing [issues](https://github.com/HexiumOS/Hexium/issues) to ensure it hasn't already been suggested.
 2. If it hasn't, create a new issue with a clear and concise description of the enhancement, including any relevant context or use cases.
 
 ### Contributing Code
@@ -54,4 +54,4 @@ We appreciate code contributions! To contribute code:
 
 ## License
 
-By contributing to InfinityOS, you agree that your contributions will be licensed under the [Apache 2.0](LICENSE.txt) license.
+By contributing to Hexium OS, you agree that your contributions will be licensed under the [Apache 2.0](LICENSE.txt) license.

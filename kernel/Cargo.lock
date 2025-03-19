@@ -39,7 +39,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "infinity_os"
+name = "hexium_os"
 version = "0.1.0"
 dependencies = [
  "flanterm",

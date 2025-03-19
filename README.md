@@ -1,6 +1,6 @@
-# **InfinityOS**
+# **Hexium OS**
 
-Welcome to **InfinityOS**, an experimental operating system written in Rust. This project explores the boundaries of Rust in systems programming and serves as a platform for learning and innovation.
+Welcome to **Hexium OS**, an experimental operating system written in Rust. This project explores the boundaries of Rust in systems programming and serves as a platform for learning and innovation.
 
 ## **🛠️ Features**
 

@@ -1,8 +1,8 @@
-# Syscall API for Infinity OS
+# Syscall API for Hexium OS
 
 ## The basics
 
-The Infinity OS syscall API is very similar to Linux to provide cross-os compability. I recommend learning about Linux syscalls before these.
+The Hexium OS syscall API is very similar to Linux to provide cross-os compability. I recommend learning about Linux syscalls before these.
 The syscall arguments will be passed in this order of registers:
 
 * `rax`: The function ID

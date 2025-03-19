@@ -7,7 +7,7 @@ $(call USER_VARIABLE,KARCH,x86_64)
 
 $(call USER_VARIABLE,QEMUFLAGS,-m 2G -d int -D log/interrupts.txt -M smm=off -no-reboot -no-shutdown)
 
-override IMAGE_NAME := infinity_os-$(KARCH)
+override IMAGE_NAME := hexium_os-$(KARCH)
 
 .PHONY: all
 all: $(IMAGE_NAME).iso

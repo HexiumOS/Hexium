@@ -1,7 +1,7 @@
 #![no_std]
 #![no_main]
 
-use infinity_os::{boot, hlt_loop, init, panic_log};
+use hexium_os::{boot, hlt_loop, init, panic_log};
 
 #[unsafe(no_mangle)]
 unsafe extern "C" fn kmain() -> ! {

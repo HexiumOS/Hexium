@@ -18,7 +18,7 @@ pub fn init() {
     interrupts::init();
      memory::init();
 
-    info!("Welcome to Infinity OS\n");
+    info!("Welcome to Hexium OS\n");
 }
 
 pub fn hlt_loop() -> ! {

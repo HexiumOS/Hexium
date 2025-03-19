@@ -1,6 +1,6 @@
-# Infinity OS authors
+# Hexium OS authors
 
-Infinity OS is developed by a community of voluntary contributors who
+Hexium OS is developed by a community of voluntary contributors who
 contribute code, bug reports, documentation, translations, support, etc.,
 across multiple repositories.
 

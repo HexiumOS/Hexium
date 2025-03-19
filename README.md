@@ -6,8 +6,8 @@ Welcome to **Hexium OS**, an experimental operating system written in Rust. This
 
 - :white_check_mark: Limine Bootloader
 - :white_check_mark: Flanterm terminal
-- :x: Global Descriptor Table
-- :x: Interrupts
+- :white_check_mark: Global Descriptor Table
+- :white_check_mark: Interrupts
 - :x: Keyboard Driver
 - :x: Memory Management
 - :x: Shell
@@ -54,7 +54,7 @@ You can run the disk image in [QEMU] through:
 make run
 ```
 
-## Project Structure
+## **:open_file_folder: Project Structure**
 
 ```bash
 /docs/              # Documentation

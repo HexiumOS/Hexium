@@ -16,7 +16,7 @@ pub mod writer;
 pub fn init() {
     writer::init();
     interrupts::init();
-     memory::init();
+    memory::init();
 
     info!("Welcome to Hexium OS\n");
 }

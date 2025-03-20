@@ -8,6 +8,7 @@ Welcome to **Hexium OS**, an experimental operating system written in Rust. This
 - :white_check_mark: Flanterm terminal
 - :white_check_mark: Global Descriptor Table
 - :white_check_mark: Interrupts
+- :white_check_mark: Paging Support
 - :x: Keyboard Driver
 - :x: Memory Management
 - :x: Shell
@@ -48,8 +49,6 @@ This creates an ISO
 
 You can run the disk image in [QEMU] through:
 
-[QEMU]: https://www.qemu.org/
-
 ```bash
 make run
 ```
@@ -65,3 +64,5 @@ make run
 /ovmf               # Virtual firmware (generated)
 /scripts            # Build & helper scripts
 ```
+
+[QEMU]: https://www.qemu.org/

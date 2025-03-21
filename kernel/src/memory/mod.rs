@@ -1,7 +1,8 @@
 use crate::{boot, trace};
+use alloc::{BootInfoFrameAllocator, init_heap};
 use spin::once::Once;
-use x86_64::{PhysAddr, VirtAddr, structures::paging::PageTable};
 use x86_64::structures::paging::OffsetPageTable;
+use x86_64::{PhysAddr, VirtAddr, structures::paging::PageTable};
 
 pub mod alloc;
 pub mod paging;
@@ -15,7 +16,17 @@ pub fn init() -> () {
     }
     trace!("Hhdm offset: {:#x}\n", phys_mem_offset());
 
+    // Create frame allocator
+    let mut frame_allocator =
+        unsafe { BootInfoFrameAllocator::init(boot::MEMMAP_REQUEST.get_response().unwrap()) };
+
     unsafe { MEM_MAPPER = Some(paging::init()) };
+
+    // Get a mutable reference to the mapper and initialize heap
+    #[allow(static_mut_refs)]
+    if let Some(mapper) = unsafe { MEM_MAPPER.as_mut() } {
+        init_heap(mapper, &mut frame_allocator).expect("heap initialization failed");
+    }
 }
 
 pub fn phys_mem_offset() -> VirtAddr {

@@ -8,11 +8,12 @@ use core::arch::asm;
 pub mod boot;
 pub mod devices;
 pub mod drivers;
+pub mod fs;
 pub mod interrupts;
 pub mod log;
 pub mod memory;
-pub mod utils;
 pub mod rtc;
+pub mod utils;
 pub mod writer;
 
 pub fn init() {
@@ -20,7 +21,11 @@ pub fn init() {
     interrupts::init();
     memory::init();
 
-    info!("Hexium OS kernel v{} succesfully initialized at {}\n", env!("CARGO_PKG_VERSION"), unsafe { rtc::read_rtc() });
+    info!(
+        "Hexium OS kernel v{} succesfully initialized at {}\n",
+        env!("CARGO_PKG_VERSION"),
+        unsafe { rtc::read_rtc() }
+    );
     info!("Welcome to Hexium OS\n");
 }
 

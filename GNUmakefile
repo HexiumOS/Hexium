@@ -50,10 +50,11 @@ ramfs:
 	mkdir -p initrd/
 	./tools/gen-initrd.sh initrd ustar
 
-$(IMAGE_NAME).iso: limine/limine kernel
+$(IMAGE_NAME).iso: limine/limine kernel ramfs
 	rm -rf iso_root
 	mkdir -p iso_root/boot
 	cp -v kernel/kernel iso_root/boot/
+	cp -v ramfs.img iso_root/boot/
 	mkdir -p iso_root/boot/limine
 	cp -v limine.conf iso_root/boot/limine/
 	mkdir -p iso_root/EFI/BOOT

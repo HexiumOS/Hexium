@@ -45,6 +45,11 @@ limine/limine:
 kernel:
 	$(MAKE) -C kernel
 
+.PHONY: ramfs
+ramfs:
+	mkdir -p initrd/
+	./tools/gen-initrd.sh initrd ustar
+
 $(IMAGE_NAME).iso: limine/limine kernel
 	rm -rf iso_root
 	mkdir -p iso_root/boot

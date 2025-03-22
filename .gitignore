@@ -2,4 +2,5 @@
 /log
 /ovmf
 *.iso
+*.img
 *.hdd

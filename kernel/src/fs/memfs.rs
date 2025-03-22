@@ -1,31 +1,72 @@
-use crate::fs::vfs::VfsOps;
 use alloc::collections::BTreeMap;
-use alloc::string::String;
+use alloc::string::{String, ToString};
 use alloc::vec::Vec;
+use crate::fs::vfs::FileSystem;
+use crate::fs::vfs::FileType;
+use crate::fs::vfs::VNode;
 
-#[derive(Debug)]
-pub struct MemFs {
-    files: BTreeMap<String, Vec<u8>>,
+
+pub struct MemFS {
+    files: BTreeMap<String, Vec<u8>>, // Store file data in memory
+    mounted: bool,
 }
 
-impl MemFs {
+impl MemFS {
     pub fn new() -> Self {
-        MemFs {
+        MemFS {
             files: BTreeMap::new(),
+            mounted: false,
         }
     }
 }
 
-impl VfsOps for MemFs {
-    fn create_file(&mut self, name: &str, data: &[u8]) {
-        self.files.insert(String::from(name), data.to_vec());
+impl FileSystem for MemFS {
+    fn mount(&mut self, _path: &str) -> Result<(), ()> {
+        self.mounted = true;
+        Ok(())
     }
 
-    fn read_file(&self, name: &str) -> Option<Vec<u8>> {
-        self.files.get(name).map(|data| data.clone())
+    fn unmount(&mut self) -> Result<(), String> {
+        self.mounted = false;
+        self.files.clear();
+        Ok(())
     }
 
-    fn delete_file(&mut self, name: &str) {
-        self.files.remove(name);
+    fn create(&mut self, path: &str, file_type: FileType) -> Result<VNode, String> {
+        if self.files.contains_key(path) {
+            return Err("File already exists".to_string());
+        }
+        self.files.insert(path.to_string(), Vec::new());
+        Ok(VNode::new(path.to_string(), file_type))
+    }
+
+    fn open(&self, path: &str) -> Result<VNode, String> {
+        if self.files.contains_key(path) {
+            Ok(VNode::new(path.to_string(), FileType::File))
+        } else {
+            Err("File not found".to_string())
+        }
+    }
+
+    fn read(&self, file: &VNode, buf: &mut [u8], offset: usize) -> Result<usize, String> {
+        if let Some(data) = self.files.get(&file.file_name) {
+            let len = buf.len().min(data.len().saturating_sub(offset));
+            buf[..len].copy_from_slice(&data[offset..offset + len]);
+            Ok(len)
+        } else {
+            Err("File not found".to_string())
+        }
+    }
+
+    fn write(&mut self, file: &VNode, buf: &[u8], offset: usize) -> Result<usize, String> {
+        if let Some(data) = self.files.get_mut(&file.file_name) {
+            if offset + buf.len() > data.len() {
+                data.resize(offset + buf.len(), 0);
+            }
+            data[offset..offset + buf.len()].copy_from_slice(buf);
+            Ok(buf.len())
+        } else {
+            Err("File not found".to_string())
+        }
     }
 }

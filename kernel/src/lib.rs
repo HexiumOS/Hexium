@@ -22,22 +22,6 @@ pub fn init() {
     memory::init();
     fs::ramfs::init();
 
-    use crate::fs::memfs::MemFS;
-    use crate::fs::vfs::FileType;
-    use crate::fs::vfs::FileSystem;
-
-    let mut memfs = MemFS::new();
-    memfs.mount("/").unwrap();
-    
-    let file = memfs.create("/test.txt", FileType::File).unwrap();
-    memfs.write(&file, b"Hello, World!", 0).unwrap();
-    
-    let mut buffer = [0u8; 13];
-    memfs.read(&file, &mut buffer, 0).unwrap();
-    
-    assert_eq!(&buffer, b"Hello, World!");
-    println!("Read content: {}", core::str::from_utf8(&buffer).unwrap());
-
     info!(
         "Hexium OS kernel v{} succesfully initialized at {}\n",
         env!("CARGO_PKG_VERSION"),

@@ -22,7 +22,7 @@ pub fn init() {
         if let Some((size, content)) = tar_lookup(archive, "./welcome.txt") {
             print!("    Found welcome.txt, size: {}\n", size);
             if let Ok(message) = core::str::from_utf8(content) {
-                print!("    Content: {}", message);
+                print!("    Content:                     {}", message);
             } else {
                 print!("    Failed to convert content to UTF-8\n");
             }
@@ -54,7 +54,7 @@ pub fn tar_lookup<'a>(archive: &'a [u8], filename: &str) -> Option<(usize, &'a [
 
         // Debug print
         if let Ok(name) = core::str::from_utf8(file_name) {
-            print!("    Found file in archive: {}\n", name);
+            print!("    Found file in archive:      {}\n", name);
         }
 
         if file_name == filename.as_bytes() {

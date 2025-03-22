@@ -20,6 +20,7 @@ pub fn init() {
     writer::init();
     interrupts::init();
     memory::init();
+    fs::ramfs::init();
 
     info!(
         "Hexium OS kernel v{} succesfully initialized at {}\n",

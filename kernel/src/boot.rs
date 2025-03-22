@@ -1,5 +1,8 @@
 use limine::BaseRevision;
-use limine::request::{FramebufferRequest, HhdmRequest, MemoryMapRequest, RequestsEndMarker, RequestsStartMarker};
+use limine::modules::InternalModule;
+use limine::request::{
+    FramebufferRequest, HhdmRequest, MemoryMapRequest, RequestsEndMarker, RequestsStartMarker, ModuleRequest,
+};
 
 #[used]
 #[unsafe(link_section = ".requests")]
@@ -16,6 +19,12 @@ pub static MEMMAP_REQUEST: MemoryMapRequest = MemoryMapRequest::new();
 #[used]
 #[unsafe(link_section = ".requests")]
 pub static FRAMEBUFFER_REQUEST: FramebufferRequest = FramebufferRequest::new();
+
+#[used]
+#[unsafe(link_section = ".requests")]
+#[allow(deprecated)]
+pub static MODULE_REQUEST: ModuleRequest = ModuleRequest::new()
+    .with_internal_modules(&[&InternalModule::new().with_path(limine::cstr!("/boot/ramfs.img"))]);
 
 #[used]
 #[unsafe(link_section = ".requests_start_marker")]

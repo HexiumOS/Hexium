@@ -49,7 +49,7 @@ We appreciate code contributions! To contribute code:
 ## Coding Guidelines
 
 - **Rust conventions**: Follow Rust's official style guide and conventions.
-- **Documentation**: Write clear and concise documentation for your code. Use doc comments (`//`) where appropriate.
+- **Documentation**: Write clear and concise documentation for your code. Use doc comments (`///`) where appropriate.
 - **Testing**: Ensure your code is well-tested. Write unit tests, integration tests, and any necessary test cases for new features or bug fixes.
 
 ## License

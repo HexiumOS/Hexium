@@ -3,8 +3,8 @@
 
 extern crate alloc;
 
-use core::arch::asm;
 use alloc::string::String;
+use core::arch::asm;
 
 pub mod boot;
 pub mod devices;
@@ -31,13 +31,10 @@ pub fn init() {
 
 fn print_startup_message(vfs: &mut fs::vfs::VFS) -> [u8; 128] {
     let mut buffer = [0u8; 128];
-    
+
     match vfs.open_file("./welcome.txt") {
         Ok(vnode) => match vfs.read_file(&vnode, &mut buffer, 0) {
-            Ok(bytes_read) => {
-                let _content =
-                    core::str::from_utf8(&buffer[..bytes_read]).unwrap_or("[Invalid UTF-8]");
-            }
+            Ok(_bytes_read) => {}
             Err(err) => {
                 error!("Error reading file: {}\n", err);
             }
@@ -46,7 +43,7 @@ fn print_startup_message(vfs: &mut fs::vfs::VFS) -> [u8; 128] {
             error!("File not found: {}\n", err);
         }
     }
-    
+
     info!(
         "Hexium OS kernel v{} succesfully initialized at {}\n",
         env!("CARGO_PKG_VERSION"),

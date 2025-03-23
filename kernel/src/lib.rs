@@ -5,7 +5,6 @@ extern crate alloc;
 
 use core::arch::asm;
 use alloc::string::String;
-use fs::vfs::VNode;
 
 pub mod boot;
 pub mod devices;
@@ -26,32 +25,36 @@ pub fn init() {
     let mut vfs = fs::vfs::VFS::new(None);
     fs::ramfs::init(&mut vfs);
 
-    let mut buffer = [0u8; 128];
+    print_startup_message(&mut vfs);
+    //vfs.unmount_fs();
+}
 
+fn print_startup_message(vfs: &mut fs::vfs::VFS) -> [u8; 128] {
+    let mut buffer = [0u8; 128];
+    
     match vfs.open_file("./welcome.txt") {
         Ok(vnode) => match vfs.read_file(&vnode, &mut buffer, 0) {
             Ok(bytes_read) => {
-                let content =
+                let _content =
                     core::str::from_utf8(&buffer[..bytes_read]).unwrap_or("[Invalid UTF-8]");
-                print!("Read {} bytes: {}\n", bytes_read, content);
             }
             Err(err) => {
-                print!("Error reading file: {}\n", err);
+                error!("Error reading file: {}\n", err);
             }
         },
         Err(err) => {
-            print!("File not found: {}\n", err);
+            error!("File not found: {}\n", err);
         }
     }
-
-    vfs.unmount_fs();
-
+    
     info!(
         "Hexium OS kernel v{} succesfully initialized at {}\n",
         env!("CARGO_PKG_VERSION"),
         unsafe { rtc::read_rtc() }
     );
     info!("{}", String::from_utf8_lossy(&buffer));
+
+    buffer
 }
 
 pub fn hlt_loop() -> ! {

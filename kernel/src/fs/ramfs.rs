@@ -4,17 +4,16 @@ use crate::{
 };
 use alloc::boxed::Box;
 use alloc::string::{String, ToString};
-use alloc::vec::Vec;
 
 pub struct RamFs {
-    files: Vec<VNode>,
+    //files: Vec<VNode>,
     archive: &'static [u8],
 }
 
 impl RamFs {
     pub fn new(archive: &'static [u8]) -> Self {
         RamFs {
-            files: Vec::new(),
+            //files: Vec::new(),
             archive,
         }
     }
@@ -32,7 +31,7 @@ impl FileSystem for RamFs {
     }
 
     fn open(&self, path: &str) -> Result<VNode, String> {
-        if let Some((size, _content)) = tar_lookup(self.archive, path) {
+        if let Some((_size, _content)) = tar_lookup(self.archive, path) {
             Ok(VNode::new(path.to_string(), FileType::File))
         } else {
             Err("File not found".to_string())

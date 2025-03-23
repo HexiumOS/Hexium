@@ -1,13 +1,71 @@
-use crate::{boot, print, trace, utils};
+use crate::{
+    boot, print, trace, utils,
+    fs::vfs::{FileSystem, FileType, VFS, VNode},
+};
+use alloc::boxed::Box;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 
-pub fn init() {
+pub struct RamFs {
+    files: Vec<VNode>,
+    archive: &'static [u8],
+}
+
+impl RamFs {
+    pub fn new(archive: &'static [u8]) -> Self {
+        RamFs {
+            files: Vec::new(),
+            archive,
+        }
+    }
+}
+
+impl FileSystem for RamFs {
+    fn mount(&mut self, _path: &str) -> Result<(), ()> {
+        print!("RamFs mounted\n");
+        Ok(())
+    }
+
+    fn unmount(&mut self) -> Result<(), String> {
+        print!("RamFs unmounted\n");
+        Ok(())
+    }
+
+    fn open(&self, path: &str) -> Result<VNode, String> {
+        if let Some((size, _content)) = tar_lookup(self.archive, path) {
+            Ok(VNode::new(path.to_string(), FileType::File))
+        } else {
+            Err("File not found".to_string())
+        }
+    }
+
+    fn read(&self, file: &VNode, buf: &mut [u8], offset: usize) -> Result<usize, String> {
+        if let Some((_size, content)) = tar_lookup(self.archive, &file.file_name) {
+            let len = buf.len().min(content.len().saturating_sub(offset));
+            buf[..len].copy_from_slice(&content[offset..offset + len]);
+            Ok(len)
+        } else {
+            Err("File not found".to_string())
+        }
+    }
+
+    fn write(&mut self, _file: &VNode, _buf: &[u8], _offset: usize) -> Result<usize, String> {
+        Err("Write operation not supported".to_string())
+    }
+
+    fn create(&mut self, _path: &str, _file_type: FileType) -> Result<VNode, String> {
+        Err("Create operation not supported".to_string())
+    }
+}
+
+pub fn init(vfs: &mut VFS) {
     if let Some(module_response) = boot::MODULE_REQUEST.get_response() {
         let modules = module_response.modules();
         if !modules.is_empty() {
             trace!("Ramdisk information:\n");
-            print!("    Ramdisk address:            {:?}\n", modules[0].addr());
-            print!("    Ramdisk size (bytes):       {:?}\n", modules[0].size());
-            print!("    Ramdisk module path:        {:?}\n", modules[0].path());
+            print!("    Ramdisk address: {:?}\n", modules[0].addr());
+            print!("    Ramdisk size (bytes): {:?}\n", modules[0].size());
+            print!("    Ramdisk module path: {:?}\n", modules[0].path());
             print!("\n");
         }
 
@@ -17,20 +75,8 @@ pub fn init() {
                 (modules[0].size() as u64).try_into().unwrap(),
             )
         };
-
-        // Try without leading slash
-        if let Some((size, content)) = tar_lookup(archive, "./welcome.txt") {
-            print!("    Found welcome.txt, size: {}\n", size);
-            if let Ok(message) = core::str::from_utf8(content) {
-                print!("    Content:                     {}", message);
-            } else {
-                print!("    Failed to convert content to UTF-8\n");
-            }
-        } else {
-            print!("    welcome.txt not found in archive\n");
-        }
-
-        print!("\n");
+        let ramfs = Box::new(RamFs::new(archive));
+        vfs.mount_fs(ramfs);
     }
 }
 
@@ -38,24 +84,15 @@ pub fn tar_lookup<'a>(archive: &'a [u8], filename: &str) -> Option<(usize, &'a [
     let mut ptr = 0;
 
     while ptr + 257 < archive.len() {
-        // Check for ustar magic
         if &archive[ptr + 257..ptr + 262] != b"ustar" {
-            print!("    No ustar magic at offset {}\n", ptr);
             break;
         }
 
-        // Read the full filename from TAR header (100 bytes)
         let header_filename = &archive[ptr..ptr + 100];
-        // Find the actual filename length (until first null byte)
         let name_len = header_filename.iter().position(|&x| x == 0).unwrap_or(100);
         let file_name = &header_filename[..name_len];
 
         let filesize = utils::octal_to_binrary(&archive[ptr + 124..ptr + 135]);
-
-        // Debug print
-        if let Ok(name) = core::str::from_utf8(file_name) {
-            print!("    Found file in archive:      {}\n", name);
-        }
 
         if file_name == filename.as_bytes() {
             return Some((

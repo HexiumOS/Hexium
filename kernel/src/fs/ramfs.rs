@@ -1,6 +1,5 @@
 use crate::{
-    boot, print, trace, utils,
-    fs::vfs::{FileSystem, FileType, VFS, VNode},
+    boot, fs::vfs::{FileSystem, FileType, VNode, VFS}, info, print, trace, utils
 };
 use alloc::boxed::Box;
 use alloc::string::{String, ToString};
@@ -21,12 +20,12 @@ impl RamFs {
 
 impl FileSystem for RamFs {
     fn mount(&mut self, _path: &str) -> Result<(), ()> {
-        print!("RamFs mounted\n");
+        info!("RamFs mounted\n");
         Ok(())
     }
 
     fn unmount(&mut self) -> Result<(), String> {
-        print!("RamFs unmounted\n");
+        info!("RamFs unmounted\n");
         Ok(())
     }
 
@@ -62,9 +61,9 @@ pub fn init(vfs: &mut VFS) {
         let modules = module_response.modules();
         if !modules.is_empty() {
             trace!("Ramdisk information:\n");
-            print!("    Ramdisk address: {:?}\n", modules[0].addr());
-            print!("    Ramdisk size (bytes): {:?}\n", modules[0].size());
-            print!("    Ramdisk module path: {:?}\n", modules[0].path());
+            print!("    Ramdisk address:        {:?}\n", modules[0].addr());
+            print!("    Ramdisk size (bytes):   {:?}\n", modules[0].size());
+            print!("    Ramdisk module path:    {:?}\n", modules[0].path());
             print!("\n");
         }
 

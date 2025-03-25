@@ -12,6 +12,7 @@ Welcome to **Hexium OS**, an experimental operating system written in Rust. This
 - :white_check_mark: Memory Management
 - :white_check_mark: In-memory File System
 - :white_check_mark: Task State Segment (TSS)
+- :white_check_mark: Heap allocator
 - :x: Keyboard Driver
 - :x: Shell
 - :x: ACPI/AML Shutdown

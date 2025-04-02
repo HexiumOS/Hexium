@@ -1,4 +1,4 @@
-use crate::{serial, serial_print};
+use crate::{serial_print};
 use crate::{utils::types::option_to_c_void, boot};
 use core::fmt;
 use core::ptr;

@@ -57,7 +57,6 @@ make run
 
 ```bash
 /docs/              # Documentation
-/drivers            # Device drivers
 /kernel/src/        # Kernel source code
 /kernel/target/     # Kernel output directory
 /limine             # Limine and UEFI binaries (generated)

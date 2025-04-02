@@ -4,12 +4,12 @@ Welcome to **Hexium OS**, an experimental operating system written in Rust. This
 
 ## **🛠️ Features**
 
-- :white_check_mark: Limine Bootloader
-- :white_check_mark: Flanterm terminal
-- :white_check_mark: Global Descriptor Table
-- :white_check_mark: Interrupts
-- :white_check_mark: Paging Support
-- :white_check_mark: Serial Support
+- :rocket: Limine Bootloader
+- :computer: Flanterm terminal
+- :scroll: Global Descriptor Table  
+- :zap: Interrupts
+- :page_facing_up: Paging Support
+- :electric_plug: Serial Support
 - :x: Keyboard Driver
 - :x: Memory Management
 - :x: Shell

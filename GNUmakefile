@@ -4,7 +4,7 @@ MAKEFLAGS += -rR
 override USER_VARIABLE = $(if $(filter $(origin $(1)),default undefined),$(eval override $(1) := $(2)))
 
 $(call USER_VARIABLE,KARCH,x86_64)
-$(call USER_VARIABLE,QEMUFLAGS,-m 2G -d int -D log/interrupts.txt -M smm=off -no-reboot -no-shutdown)
+$(call USER_VARIABLE,QEMUFLAGS,-m 2G -d int -D log/interrupts.txt -M smm=off -no-reboot -no-shutdown -serial stdio)
 
 override IMAGE_NAME := hexium_os-$(KARCH)
 

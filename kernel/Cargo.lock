@@ -53,6 +53,7 @@ dependencies = [
  "limine",
  "linked_list_allocator",
  "spin",
+ "uart_16550",
  "x86",
  "x86_64",
 ]
@@ -137,6 +138,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5b9eb1a2f4c41445a3a0ff9abc5221c5fcd28e1f13cd7c0397706f9ac938ddb0"
 dependencies = [
  "lock_api",
+]
+
+[[package]]
+name = "uart_16550"
+version = "0.3.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e492212ac378a5e00da953718dafb1340d9fbaf4f27d6f3c5cab03d931d1c049"
+dependencies = [
+ "bitflags 2.4.2",
+ "rustversion",
+ "x86",
 ]
 
 [[package]]

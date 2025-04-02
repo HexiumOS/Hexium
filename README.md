@@ -4,6 +4,12 @@ Welcome to **Hexium OS**, an experimental operating system written in Rust. This
 
 ## **🛠️ Features**
 
+- :rocket: Limine Bootloader
+- :computer: Flanterm terminal
+- :scroll: Global Descriptor Table  
+- :zap: Interrupts
+- :page_facing_up: Paging Support
+- :electric_plug: Serial Support
 - :white_check_mark: Limine Bootloader
 - :white_check_mark: Flanterm terminal
 - :white_check_mark: Global Descriptor Table
@@ -17,7 +23,6 @@ Welcome to **Hexium OS**, an experimental operating system written in Rust. This
 - :x: Shell
 - :x: ACPI/AML Shutdown
 - :x: CpuId Support
-- :x: Serial Support
 - :x: Mouse Driver
 - :x: Graphical Interface (GUI)
 - :x: ELF Loader
@@ -58,7 +63,6 @@ make run
 
 ```bash
 /docs/              # Documentation
-/drivers            # Device drivers
 /kernel/src/        # Kernel source code
 /kernel/target/     # Kernel output directory
 /limine             # Limine and UEFI binaries (generated)

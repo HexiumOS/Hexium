@@ -1,3 +1,4 @@
+use crate::serial_print;
 use crate::{utils::types::option_to_c_void, boot};
 use core::fmt;
 use core::ptr;
@@ -79,6 +80,7 @@ impl Writer {
 impl fmt::Write for Writer {
     fn write_str(&mut self, s: &str) -> fmt::Result {
         self.write_string(s);
+        
         Ok(())
     }
 }
@@ -101,5 +103,6 @@ pub fn _print(args: fmt::Arguments) {
 
     interrupts::without_interrupts(|| {
         WRITER.lock().write_fmt(args).unwrap();
+        serial_print!("{}", args);
     });
 }

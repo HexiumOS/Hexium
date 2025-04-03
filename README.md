@@ -14,8 +14,7 @@ Welcome to **Hexium OS**, an experimental operating system written in Rust. This
 - :file_cabinet: In-memory File System
 - :dart: Task State Segment (TSS)
 - :wrench: Heap allocator
-- :keyboard: Keyboard Driver
-- :clock8: Multitasking
+- :x: Keyboard Driver
 - :x: Shell
 - :x: ACPI/AML Shutdown
 - :x: CpuId Support

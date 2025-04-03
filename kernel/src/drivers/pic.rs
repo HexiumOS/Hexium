@@ -80,8 +80,8 @@ impl ChainedPics {
         self.pics[1].data.write(MODE_8086);
         wait();
 
-        // Mask everything exept the PIT
-        self.write_masks(0xFE, 0xFF);
+        // Mask everything exept the PIT and Keyboard
+        self.write_masks(0xFC, 0xFF);
     }}
 
     pub unsafe fn read_masks(&mut self) -> [u8; 2] { unsafe {

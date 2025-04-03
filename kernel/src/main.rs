@@ -9,8 +9,6 @@ unsafe extern "C" fn kmain() -> ! {
 
     init();
 
-    panic!("Kernel panic test");
-
     hlt_loop();
 }
 

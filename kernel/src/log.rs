@@ -33,7 +33,7 @@ macro_rules! log {
 #[macro_export]
 macro_rules! trace {
     ($($arg:tt)*) => {
-        $crate::log!($crate::log::LogLevel::Trace, $($arg)*);
+        $crate::log!($crate::log::LogLevel::Trace, $($arg)*)
     };
 }
 

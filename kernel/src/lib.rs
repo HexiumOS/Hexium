@@ -15,6 +15,7 @@ pub mod log;
 pub mod memory;
 pub mod rtc;
 pub mod serial;
+pub mod task;
 pub mod utils;
 pub mod writer;
 

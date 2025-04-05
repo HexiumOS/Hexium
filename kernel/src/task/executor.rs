@@ -25,7 +25,9 @@ impl Executor {
         if self.tasks.insert(task.id, task).is_some() {
             return Err("task with same ID already in tasks".to_string());
         }
-        self.task_queue.push(task_id).expect("queue full");
+        if self.task_queue.push(task_id).is_err() {
+            return Err("task queue is full".to_string());
+        }
         Ok(())
     }
 

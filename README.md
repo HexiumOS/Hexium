@@ -10,16 +10,12 @@ Welcome to **Hexium OS**, an experimental operating system written in Rust. This
 - :zap: Interrupts
 - :page_facing_up: Paging Support
 - :electric_plug: Serial Support
-- :white_check_mark: Limine Bootloader
-- :white_check_mark: Flanterm terminal
-- :white_check_mark: Global Descriptor Table
-- :white_check_mark: Interrupts
-- :white_check_mark: Paging Support
-- :white_check_mark: Memory Management
-- :white_check_mark: In-memory File System
-- :white_check_mark: Task State Segment (TSS)
-- :white_check_mark: Heap allocator
-- :x: Keyboard Driver
+- :brain: Memory Management
+- :file_cabinet: In-memory File System
+- :dart: Task State Segment (TSS)
+- :wrench: Heap allocator
+- :keyboard: Keyboard Driver
+- :clock8: Multitasking
 - :x: Shell
 - :x: ACPI/AML Shutdown
 - :x: CpuId Support
@@ -33,7 +29,6 @@ Welcome to **Hexium OS**, an experimental operating system written in Rust. This
 - :x: Integrated Development Environment (IDE)
 - :x: C/C++ Compiler
 - :x: Processes
-- :x: Multitasking
 - :x: Installation Setup
 - :x: Web Browser
 - :x: User Documentation

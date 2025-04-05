@@ -14,6 +14,8 @@ unsafe extern "C" fn kmain() -> ! {
 
 #[panic_handler]
 fn rust_panic(info: &core::panic::PanicInfo) -> ! {
-    panic_log!("{}", info);
+    use hexium_os::utils::registers::*;
+    panic_log!("{}\n", info);
+    print_register_dump(&get_registers());
     hlt_loop();
 }

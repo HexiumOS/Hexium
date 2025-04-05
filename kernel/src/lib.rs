@@ -15,6 +15,7 @@ pub mod log;
 pub mod memory;
 pub mod rtc;
 pub mod serial;
+pub mod task;
 pub mod utils;
 pub mod writer;
 
@@ -25,8 +26,12 @@ pub fn init() {
 
     let mut vfs = fs::vfs::VFS::new(None);
     fs::ramfs::init(&mut vfs);
-
     print_startup_message(&mut vfs);
+
+    let mut executor = crate::task::executor::Executor::new();
+    let _ = executor.spawn(crate::task::Task::new(devices::keyboard::trace_keypresses()));
+    executor.run();
+
     //vfs.unmount_fs();
 }
 

@@ -29,7 +29,7 @@ pub fn init() {
     print_startup_message(&mut vfs);
 
     let mut executor = crate::task::executor::Executor::new();
-    executor.spawn(crate::task::Task::new(devices::keyboard::trace_keypresses()));
+    let _ = executor.spawn(crate::task::Task::new(devices::keyboard::trace_keypresses()));
     executor.run();
 
     //vfs.unmount_fs();

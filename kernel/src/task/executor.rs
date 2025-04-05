@@ -1,5 +1,7 @@
+use crate::error;
+
 use super::{Task, TaskId};
-use alloc::{collections::BTreeMap, sync::Arc, task::Wake};
+use alloc::{collections::BTreeMap, string::{String, ToString}, sync::Arc, task::Wake};
 use core::task::{Context, Poll, Waker};
 use crossbeam_queue::ArrayQueue;
 
@@ -18,12 +20,13 @@ impl Executor {
         }
     }
 
-    pub fn spawn(&mut self, task: Task) {
+    pub fn spawn(&mut self, task: Task) -> Result<(), String> {
         let task_id = task.id;
         if self.tasks.insert(task.id, task).is_some() {
-            panic!("task with same ID already in tasks");
+            return Err("task with same ID already in tasks".to_string());
         }
         self.task_queue.push(task_id).expect("queue full");
+        Ok(())
     }
 
     pub fn run(&mut self) -> ! {
@@ -86,17 +89,21 @@ impl TaskWaker {
         }))
     }
 
-    fn wake_task(&self) {
-        self.task_queue.push(self.task_id).expect("task_queue full");
+    fn wake_task(&self) -> Result<(), ()> {
+        if self.task_queue.push(self.task_id).is_err() {
+            error!("Warning: task queue is full, task {:?} could not be woken", self.task_id);
+            return Err(());
+        }
+        Ok(())
     }
 }
 
 impl Wake for TaskWaker {
     fn wake(self: Arc<Self>) {
-        self.wake_task();
+        let _ = self.wake_task();
     }
 
     fn wake_by_ref(self: &Arc<Self>) {
-        self.wake_task();
+        let _ = self.wake_task();
     }
 }

@@ -1,10 +1,13 @@
 #![no_std]
+#![no_main]
 #![feature(abi_x86_interrupt)]
+#![feature(custom_test_frameworks)]
+#![test_runner(test_runner)]
 
 extern crate alloc;
 
 use alloc::string::String;
-use core::arch::asm;
+use core::{arch::asm, panic::PanicInfo};
 
 pub mod boot;
 pub mod devices;
@@ -26,12 +29,17 @@ pub fn init() {
 
     let mut vfs = fs::vfs::VFS::new(None);
     fs::ramfs::init(&mut vfs);
+    
+    info!("Before\n");
     print_startup_message(&mut vfs);
+    info!("After\n");
 
-    let mut executor = crate::task::executor::Executor::new();
-    let _ = executor.spawn(crate::task::Task::new(devices::keyboard::trace_keypresses()));
-    executor.run();
+    // RYAN-NOTES: Commented out for now as the code doesn't run past this section. Will return it back.
+    // let mut executor = crate::task::executor::Executor::new();
+    // let _ = executor.spawn(crate::task::Task::new(devices::keyboard::trace_keypresses()));
+    // executor.run();
 
+    info!("After2\n");
     //vfs.unmount_fs();
 }
 
@@ -49,6 +57,8 @@ fn print_startup_message(vfs: &mut fs::vfs::VFS) -> [u8; 128] {
             error!("File not found: {}\n", err);
         }
     }
+
+    info!("Testing\n");
 
     info!(
         "Hexium OS kernel v{} succesfully initialized at {}\n",
@@ -71,4 +81,14 @@ pub fn hlt_loop() -> ! {
             asm!("idle 0");
         }
     }
+}
+
+#[panic_handler]
+fn panic(_info: &PanicInfo) -> ! {
+    loop {}
+}
+
+
+fn test_runner(_test: &[&i32]) {
+    loop {}
 }

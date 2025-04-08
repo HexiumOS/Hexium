@@ -57,7 +57,8 @@ make run
 ## **:open_file_folder: Project Structure**
 
 ```bash
-/docs/              # Documentation
+/initrd/            # The initial ramdisk
+/userspace/         # Userspace programs
 /kernel/src/        # Kernel source code
 /kernel/target/     # Kernel output directory
 /limine             # Limine and UEFI binaries (generated)

@@ -9,7 +9,7 @@ LD := ld
 ASFLAGS := -f elf64
 
 # Output directories
-BIN_DIR := bin
+BIN_DIR := applications
 
 # Find all assembly source files
 ASM_SRCS := $(wildcard */main.asm)
@@ -33,6 +33,7 @@ $(BIN_DIR)/%: %/main.asm
 .PHONY: clean
 clean:
 	rm -rf $(BIN_DIR)
+	rm -rf ../initrd/$(BIN_DIR)
 
 .PHONY: install
 install: all

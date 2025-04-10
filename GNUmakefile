@@ -28,6 +28,14 @@ run-x86_64: ovmf/ovmf-code-$(KARCH).fd ovmf/ovmf-vars-$(KARCH).fd $(IMAGE_NAME).
 		-cdrom $(IMAGE_NAME).iso \
 		$(QEMUFLAGS)
 
+.PHONY: test-run
+test-run:
+	make test
+	 qemu-system-x86_64 hexium_os-x86_64-test.iso 
+
+.PHONY: test
+test: $(IMAGE_NAME)-test.iso
+
 ovmf/ovmf-code-$(KARCH).fd:
 	mkdir -p ovmf
 	curl -Lo $@ https://github.com/osdev0/edk2-ovmf-nightly/releases/latest/download/ovmf-code-$(KARCH).fd
@@ -44,6 +52,10 @@ limine/limine:
 .PHONY: kernel
 kernel:
 	$(MAKE) -C kernel
+
+.PHONY: kernel-test
+kernel-test:
+	$(MAKE) -C kernel test
 
 .PHONY: ramfs
 ramfs:
@@ -67,6 +79,25 @@ $(IMAGE_NAME).iso: limine/limine kernel ramfs
 		-efi-boot-part --efi-boot-image --protective-msdos-label \
 		iso_root -o $(IMAGE_NAME).iso
 	./limine/limine bios-install $(IMAGE_NAME).iso
+	rm -rf iso_root
+
+$(IMAGE_NAME)-test.iso: limine/limine kernel-test ramfs
+	rm -rf iso_root
+	mkdir -p iso_root/boot
+	cp -v kernel/kernel-test iso_root/boot/
+	cp -v ramfs.img iso_root/boot/
+	mkdir -p iso_root/boot/limine
+	cp -v limine.conf iso_root/boot/limine/
+	mkdir -p iso_root/EFI/BOOT
+	cp -v limine/limine-bios.sys limine/limine-bios-cd.bin limine/limine-uefi-cd.bin iso_root/boot/limine/
+	cp -v limine/BOOTX64.EFI iso_root/EFI/BOOT/
+	cp -v limine/BOOTIA32.EFI iso_root/EFI/BOOT/
+	xorriso -as mkisofs -b boot/limine/limine-bios-cd.bin \
+		-no-emul-boot -boot-load-size 4 -boot-info-table \
+		--efi-boot boot/limine/limine-uefi-cd.bin \
+		-efi-boot-part --efi-boot-image --protective-msdos-label \
+		iso_root -o $(IMAGE_NAME)-test.iso
+	./limine/limine bios-install $(IMAGE_NAME)-test.iso
 	rm -rf iso_root
 
 .PHONY: clean

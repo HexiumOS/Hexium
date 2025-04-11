@@ -41,7 +41,9 @@ Welcome to **Hexium OS**, an experimental operating system written in Rust. This
 
 ## **⚙️ Building**
 
-This project requires a nightly version of Rust because it uses some unstable features. You might need to run `rustup update nightly --force` to update to the latest nightly even if some components such as `rustfmt` are missing it.
+This project requires a nightly version of Rust because it uses some unstable features. You might need to run `rustup update nightly --force` to update to the latest nightly even if some components such as `rustfmt` are missing it. Additionally, ensure you have `rustc` and `cargo` version 1.86 or higher installed.
+
+You will also need `xorriso`, a tool for creating ISO images.
 
 You can build the project by running:
 

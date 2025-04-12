@@ -23,6 +23,10 @@ jobs:
         target: x86_64-unknown-none
         components: rust-src
 
+
+    - name: Setup Netwide Assembler
+      uses: ilammy/setup-nasm@v1
+
     - name: Install xorriso
       run: sudo apt-get update && sudo apt-get install -y xorriso
 

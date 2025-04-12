@@ -1,6 +1,7 @@
 /limine
 /log
 /ovmf
+/initrd/applications/
 *.iso
 *.img
 *.hdd

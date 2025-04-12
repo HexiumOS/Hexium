@@ -4,7 +4,7 @@ MAKEFLAGS += -rR
 override USER_VARIABLE = $(if $(filter $(origin $(1)),default undefined),$(eval override $(1) := $(2)))
 
 $(call USER_VARIABLE,KARCH,x86_64)
-$(call USER_VARIABLE,QEMUFLAGS,-m 2G -d int -D log/interrupts.txt -M smm=off -no-reboot -no-shutdown -serial stdio)
+$(call USER_VARIABLE,QEMUFLAGS,-m 2G -d int -D log/interrupts.txt -M smm=off -no-reboot -no-shutdown -serial stdio -m 128M)
 
 override IMAGE_NAME := hexium_os-$(KARCH)
 
@@ -45,9 +45,14 @@ limine/limine:
 kernel:
 	$(MAKE) -C kernel
 
+.PHONY: userspace
+userspace:
+	$(MAKE) -C userspace
+
 .PHONY: ramfs
-ramfs:
+ramfs: userspace
 	mkdir -p initrd/
+	$(MAKE) -C userspace install
 	./tools/gen-initrd.sh initrd ustar
 
 $(IMAGE_NAME).iso: limine/limine kernel ramfs
@@ -72,7 +77,9 @@ $(IMAGE_NAME).iso: limine/limine kernel ramfs
 .PHONY: clean
 clean:
 	$(MAKE) -C kernel clean
+	$(MAKE) -C userspace clean
 	rm -rf iso_root $(IMAGE_NAME).iso
+	rm -rf ramfs.img
 
 .PHONY: distclean
 distclean: clean

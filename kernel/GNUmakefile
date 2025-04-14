@@ -30,12 +30,22 @@ all:
 
 test:
 	RUSTFLAGS="-C relocation-model=static" cargo build --tests --target $(RUST_TARGET) --profile $(RUST_PROFILE)
+	find . -type f -name 'hexium_os-*' ! -name '*.*' -printf '%T@ %p\n' | sort -nr | head -n1 | cut -d' ' -f2-
+	
+	shell find . -type f -name 'hexium_os-*' ! -name '*.*' -printf '%T@ %p\n' | sort -nr | head -n1 | cut -d' ' -f2-
+	echo $(find . -type f -name 'hexium_os-*' ! -name '*.*' -printf '%T@ %p\n' | sort -nr | head -n1 | cut -d' ' -f2-)
+	echo '$(find . -type f -name 'hexium_os-*' ! -name '*.*' -printf '%T@ %p\n' | sort -nr | head -n1 | cut -d' ' -f2-)'
+	echo "$(find . -type f -name 'hexium_os-*' ! -name '*.*' -printf '%T@ %p\n' | sort -nr | head -n1 | cut -d' ' -f2-)"
+	echo $(shell find . -type f -name 'hexium_os-*' ! -name '*.*' -printf '%T@ %p\n' | sort -nr | head -n1 | cut -d' ' -f2-)
+	echo '$(shell find . -type f -name 'hexium_os-*' ! -name '*.*' -printf '%T@ %p\n' | sort -nr | head -n1 | cut -d' ' -f2-)'
+	echo "$(shell find . -type f -name 'hexium_os-*' ! -name '*.*' -printf '%T@ %p\n' | sort -nr | head -n1 | cut -d' ' -f2-)"
 	cp "$(shell find . -type f -name 'hexium_os-*' ! -name '*.*' -printf '%T@ %p\n' | sort -nr | head -n1 | cut -d' ' -f2-)" kernel-test
 
 .PHONY: clean
 clean:
 	cargo clean
 	rm -rf kernel
+	rm -rf kernel-test
 
 .PHONY: distclean
 distclean: clean

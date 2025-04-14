@@ -2,12 +2,36 @@
 #![no_main]
 #![feature(custom_test_frameworks)]
 #![test_runner(crate::test_runner)]
-#![reexport_test_harness_main = "test_main"]
+// #![reexport_test_harness_main = "test_main"]
 
+use hexium_os::tests::{run_tests, TestCase};
 use hexium_os::{boot, hlt_loop, init, panic_log};
 use hexium_os::{info, print, println}; // RYANS_NOTES: Keeping the imports used in the comments further below
 // use crate::{info, print, println};
 
+fn test_example() -> Result<(), &'static str>{
+    assert_eq!(1+1, 2);
+    Ok(())
+}
+
+pub fn test_main() {
+    let tests = [
+        TestCase{
+            name: "test_example",
+            function: test_example,
+        }
+    ];
+
+    run_tests(&tests);
+}
+
+#[cfg(feature = "test")]
+unsafe extern "C" fn kmain() -> ! {
+    test_main();
+    loop {}
+}
+
+#[cfg(not(feature = "test"))]
 #[unsafe(no_mangle)]
 unsafe extern "C" fn kmain() -> ! {
     assert!(boot::BASE_REVISION.is_supported());

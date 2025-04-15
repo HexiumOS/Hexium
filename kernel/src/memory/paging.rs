@@ -28,9 +28,9 @@ pub extern "x86-interrupt" fn page_fault_handler(
 ) {
     use x86_64::registers::control::Cr2;
 
-    error!("EXCEPTION: PAGE FAULT\n");
-    error!("Accessed Address: {:?}\n", Cr2::read());
-    error!("Error Code: {:?}\n", error_code);
+    error!("EXCEPTION: PAGE FAULT");
+    error!("Accessed Address: {:?}", Cr2::read());
+    error!("Error Code: {:?}", error_code);
     print!("\n{:#?}\n", stack_frame);
     hlt_loop();
 }

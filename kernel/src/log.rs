@@ -26,7 +26,7 @@ macro_rules! log {
             $crate::log::LogLevel::Panic => ("PANIC", "\x1b[97;41m"), // White text on Red background
         };
 
-        $crate::print!("{}[{}]\x1b[0m {}", color_code, label, format_args!($($arg)*));
+        $crate::println!("{}[{}]\x1b[0m {}", color_code, label, format_args!($($arg)*));
     }};
 }
 

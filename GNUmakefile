@@ -81,10 +81,11 @@ $(IMAGE_NAME).iso: limine/limine kernel ramfs
 	./limine/limine bios-install $(IMAGE_NAME).iso
 	rm -rf iso_root
 
+# TODO: Use different build folders to avoid cross contamination
 $(IMAGE_NAME)-test.iso: limine/limine kernel-test ramfs
 	rm -rf iso_root
 	mkdir -p iso_root/boot
-	cp -v kernel/kernel-test iso_root/boot/
+	cp -v kernel/kernel-test iso_root/boot/kernel
 	cp -v ramfs.img iso_root/boot/
 	mkdir -p iso_root/boot/limine
 	cp -v limine.conf iso_root/boot/limine/
@@ -103,7 +104,7 @@ $(IMAGE_NAME)-test.iso: limine/limine kernel-test ramfs
 .PHONY: clean
 clean:
 	$(MAKE) -C kernel clean
-	rm -rf iso_root $(IMAGE_NAME).iso
+	rm -rf iso_root *.iso
 
 .PHONY: distclean
 distclean: clean

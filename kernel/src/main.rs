@@ -25,13 +25,19 @@ pub fn test_main() {
     run_tests(&tests);
 }
 
-#[cfg(feature = "test")]
+#[cfg(test)]
+#[unsafe(no_mangle)]
 unsafe extern "C" fn kmain() -> ! {
+    // info!("Test Main");
+    assert!(boot::BASE_REVISION.is_supported());
+    init();
+    info!("Test Main:1");
     test_main();
+    info!("Test Main:2");
     loop {}
 }
 
-#[cfg(not(feature = "test"))]
+#[cfg(not(test))]
 #[unsafe(no_mangle)]
 unsafe extern "C" fn kmain() -> ! {
     assert!(boot::BASE_REVISION.is_supported());

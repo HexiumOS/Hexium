@@ -31,16 +31,16 @@ pub fn init() {
     let mut vfs = fs::vfs::VFS::new(None);
     fs::ramfs::init(&mut vfs);
     
-    info!("Before\n");
+    info!("Before");
     print_startup_message(&mut vfs);
-    info!("After\n");
+    info!("After");
 
     // RYAN-NOTES: Commented out for now as the code doesn't run past this section. Will return it back.
     // let mut executor = crate::task::executor::Executor::new();
     // let _ = executor.spawn(crate::task::Task::new(devices::keyboard::trace_keypresses()));
     // executor.run();
 
-    info!("After2\n");
+    info!("After2");
     //vfs.unmount_fs();
 }
 
@@ -51,18 +51,18 @@ fn print_startup_message(vfs: &mut fs::vfs::VFS) -> [u8; 128] {
         Ok(vnode) => match vfs.read_file(&vnode, &mut buffer, 0) {
             Ok(_bytes_read) => {}
             Err(err) => {
-                error!("Error reading file: {}\n", err);
+                error!("Error reading file: {}", err);
             }
         },
         Err(err) => {
-            error!("File not found: {}\n", err);
+            error!("File not found: {}", err);
         }
     }
 
-    info!("Testing\n");
+    info!("Testing");
 
     info!(
-        "Hexium OS kernel v{} succesfully initialized at {}\n",
+        "Hexium OS kernel v{} succesfully initialized at {}",
         env!("CARGO_PKG_VERSION"),
         unsafe { rtc::read_rtc() }
     );

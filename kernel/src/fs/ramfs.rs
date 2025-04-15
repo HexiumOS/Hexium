@@ -20,12 +20,12 @@ impl RamFs {
 
 impl FileSystem for RamFs {
     fn mount(&mut self, _path: &str) -> Result<(), ()> {
-        info!("RamFs mounted\n");
+        info!("RamFs mounted");
         Ok(())
     }
 
     fn unmount(&mut self) -> Result<(), String> {
-        info!("RamFs unmounted\n");
+        info!("RamFs unmounted");
         Ok(())
     }
 
@@ -60,7 +60,7 @@ pub fn init(vfs: &mut VFS) {
     if let Some(module_response) = boot::MODULE_REQUEST.get_response() {
         let modules = module_response.modules();
         if !modules.is_empty() {
-            trace!("Ramdisk information:\n");
+            trace!("Ramdisk information:");
             print!("    Ramdisk address:        {:?}\n", modules[0].addr());
             print!("    Ramdisk size (bytes):   {:?}\n", modules[0].size());
             print!("    Ramdisk module path:    {:?}\n", modules[0].path());

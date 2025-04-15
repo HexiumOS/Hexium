@@ -14,7 +14,7 @@ pub fn init() -> () {
     if let Some(hhdm_response) = boot::HHDM_REQUEST.get_response() {
         PHYS_MEM_OFFSET.call_once(|| VirtAddr::new(hhdm_response.offset()));
     }
-    trace!("Hhdm offset: {:#x}\n", phys_mem_offset());
+    trace!("Hhdm offset: {:#x}", phys_mem_offset());
 
     // Create frame allocator
     let mut frame_allocator =

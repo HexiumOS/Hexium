@@ -29,7 +29,7 @@ pub fn init() {
 }
 
 extern "x86-interrupt" fn breakpoint_handler(stack_frame: InterruptStackFrame) {
-    debug!("EXCEPTION: BREAKPOINT\n{:#?}\n", stack_frame);
+    debug!("EXCEPTION: BREAKPOINT\n{:#?}", stack_frame);
 }
 
 extern "x86-interrupt" fn double_fault_handler(

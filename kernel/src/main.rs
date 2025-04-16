@@ -8,12 +8,14 @@ use hexium_os::tests::{run_tests, TestCase};
 use hexium_os::{boot, hlt_loop, init, panic_log, serial_println, exit_qemu, QemuExitCode};
 use hexium_os::{info, print, println}; // RYANS_NOTES: Keeping the imports used in the comments further below
 // use crate::{info, print, println};
-#[test_case]
-fn test_fail_example() {
-    serial_println!("test_fail_example...");
-    assert_eq!(0, 1);
-    serial_println!("ok!");
-}
+
+// RYAN_NOTES: Commented out because failing tests failed to close qemu since the main panic handler is still being called instead of the test panic handler
+// #[test_case]
+// fn test_fail_example() {
+//     serial_println!("test_fail_example...");
+//     assert_eq!(0, 1);
+//     serial_println!("ok!");
+// }
 
 #[test_case]
 fn test_example2() {

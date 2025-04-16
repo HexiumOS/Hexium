@@ -103,6 +103,5 @@ pub fn _print(args: fmt::Arguments) {
 
     interrupts::without_interrupts(|| {
         WRITER.lock().write_fmt(args).unwrap();
-        serial_print!("{}", args);
     });
 }

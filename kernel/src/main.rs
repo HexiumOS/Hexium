@@ -5,21 +5,21 @@
 #![reexport_test_harness_main = "test_main"]
 
 use hexium_os::tests::{run_tests, TestCase};
-use hexium_os::{boot, hlt_loop, init, panic_log};
+use hexium_os::{boot, hlt_loop, init, panic_log, serial_println, exit_qemu, QemuExitCode};
 use hexium_os::{info, print, println}; // RYANS_NOTES: Keeping the imports used in the comments further below
 // use crate::{info, print, println};
 #[test_case]
 fn test_fail_example() {
-    println!("test_fail_example...");
-    assert_eq!(1, 1);
-    println!("ok!");
+    serial_println!("test_fail_example...");
+    assert_eq!(0, 1);
+    serial_println!("ok!");
 }
 
 #[test_case]
 fn test_example2() {
-    println!("test_example2");
+    serial_println!("test_example2");
     assert_eq!(1+1, 2);
-    println!("ok!");
+    serial_println!("ok!");
 }
 
 fn test_example() -> Result<(), &'static str>{
@@ -94,27 +94,11 @@ unsafe extern "C" fn kmain() -> ! {
 
 #[cfg(test)]
 pub fn test_runner(tests: &[&dyn Fn()]) {
-    println!("Running {} tests", tests.len());
+    serial_println!("Running {} tests", tests.len());
 
     for test in tests {
         test();
     }
 
     exit_qemu(QemuExitCode::Success);
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-#[repr(u32)]
-pub enum QemuExitCode {
-    Success = 0x10,
-    Failed = 0x11,
-}
-
-pub fn exit_qemu(exit_code: QemuExitCode) {
-    use x86_64::instructions::port::Port;
-
-    unsafe {
-        let mut port = Port::new(0xf4);
-        port.write(exit_code as u32);
-    }
 }

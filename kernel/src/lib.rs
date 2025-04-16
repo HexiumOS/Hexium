@@ -8,6 +8,7 @@ extern crate alloc;
 
 use alloc::string::String;
 use core::{arch::asm, panic::PanicInfo};
+use utils::registers::{get_registers, print_register_dump};
 
 pub mod boot;
 pub mod devices;
@@ -84,12 +85,79 @@ pub fn hlt_loop() -> ! {
     }
 }
 
+#[cfg(test)]
 #[panic_handler]
-fn panic(_info: &PanicInfo) -> ! {
-    loop {}
+fn rust_panic(info: &core::panic::PanicInfo) -> ! {
+    serial_println!("[failed]");
+    serial_println!("Error: {}", info);
+    exit_qemu(QemuExitCode::Failed);
+    hlt_loop();
 }
 
+#[cfg(not(test))]
+#[panic_handler]
+fn rust_panic(info: &core::panic::PanicInfo) -> ! {
+    panic_log!("{}\n", info);
+    print_register_dump(&get_registers());
+    #[cfg(test)]
+    println!("Test");
+    #[cfg(not(test))]
+    println!("Not Test");
+    print!("Main Panic");
+    hlt_loop();
+}
+
+// #[cfg(not(test))]
+// #[panic_handler]
+// fn rust_panic(info: &core::panic::PanicInfo) -> ! {
+//     serial_println!("Rust panic");
+//     #[cfg(test)]
+//     test_panic_handler(&info);    
+//     #[cfg(not(test))]
+//     main_panic_handler(&info);
+//     hlt_loop();
+// }
+
+// fn main_panic_handler(info: &PanicInfo) {
+//     println!("Main panic handler");
+//     panic_log!("{}\n", info);
+//     print_register_dump(&get_registers());
+//     #[cfg(test)]
+//     println!("Test");
+//     #[cfg(not(test))]
+//     println!("Not Test");
+//     print!("Main Panic");
+// }
+
+// fn test_panic_handler(info: &PanicInfo) {
+//     println!("Test panic handler");
+//     serial_println!("[failed]");
+//     serial_println!("Error: {}", info);
+//     exit_qemu(QemuExitCode::Failed);
+// }
 
 fn test_runner(_test: &[&i32]) {
     loop {}
 }
+
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(u32)]
+pub enum QemuExitCode {
+    Success = 0x10,
+    Failed = 0x11,
+}
+
+pub fn exit_qemu(exit_code: QemuExitCode) {
+    use x86_64::instructions::port::Port;
+
+    unsafe {
+        let mut port = Port::new(0xf4);
+        port.write(exit_code as u32);
+    }
+}
+
+// #[panic_handler]
+// fn panic(_info: &PanicInfo) -> ! {
+//     loop {}
+// }

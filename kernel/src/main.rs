@@ -5,7 +5,7 @@
 #![reexport_test_harness_main = "test_main"]
 
 use hexium_os::tests::{run_tests, TestCase};
-use hexium_os::{boot, hlt_loop, init, panic_log, serial_println, exit_qemu, QemuExitCode};
+use hexium_os::{boot, hlt_loop, init, panic_log, serial_println, exit_qemu, QemuExitCode, Testable};
 use hexium_os::{info, print, println}; // RYANS_NOTES: Keeping the imports used in the comments further below
 // use crate::{info, print, println};
 
@@ -19,9 +19,9 @@ use hexium_os::{info, print, println}; // RYANS_NOTES: Keeping the imports used 
 
 #[test_case]
 fn test_example2() {
-    serial_println!("test_example2");
+    // serial_println!("test_example2");
     assert_eq!(1+1, 2);
-    serial_println!("ok!");
+    // serial_println!("ok!");
 }
 
 fn test_example() -> Result<(), &'static str>{
@@ -95,11 +95,11 @@ unsafe extern "C" fn kmain() -> ! {
 // }
 
 #[cfg(test)]
-pub fn test_runner(tests: &[&dyn Fn()]) {
+pub fn test_runner(tests: &[&dyn Testable]) {
     serial_println!("Running {} tests", tests.len());
 
     for test in tests {
-        test();
+        test.run();
     }
 
     exit_qemu(QemuExitCode::Success);

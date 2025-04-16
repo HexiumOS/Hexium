@@ -31,7 +31,7 @@ run-x86_64: ovmf/ovmf-code-$(KARCH).fd ovmf/ovmf-vars-$(KARCH).fd $(IMAGE_NAME).
 .PHONY: test-run
 test-run:
 	make test
-	 qemu-system-x86_64 hexium_os-x86_64-test.iso -device isa-debug-exit,iobase=0xf4,iosize=0x04 -serial stdio || [ $$? -eq 33 ] 
+	qemu-system-x86_64 hexium_os-x86_64-test.iso -device isa-debug-exit,iobase=0xf4,iosize=0x04 -serial stdio -display none || [ $$? -eq 33 ]
 
 .PHONY: test
 test: $(IMAGE_NAME)-test.iso

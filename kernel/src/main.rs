@@ -1,30 +1,25 @@
 #![no_std]
 #![no_main]
 #![feature(custom_test_frameworks)]
-#![test_runner(crate::test_runner)]
+#![test_runner(hexium_os::test_runner)]
 #![reexport_test_harness_main = "test_main"]
 
 use core::fmt::Write;
 
-use hexium_os::tests::{run_tests, TestCase};
 use hexium_os::writer::WRITER;
+use core::panic::PanicInfo;
 use hexium_os::{boot, hlt_loop, init, panic_log, serial_println, exit_qemu, QemuExitCode, Testable};
 use hexium_os::{info, print, println}; // RYANS_NOTES: Keeping the imports used in the comments further below
 // use crate::{info, print, println};
 
-// RYAN_NOTES: Commented out because failing tests failed to close qemu since the main panic handler is still being called instead of the test panic handler
-// #[test_case]
-// fn test_fail_example() {
-//     serial_println!("test_fail_example...");
-//     assert_eq!(0, 1);
-//     serial_println!("ok!");
-// }
+#[test_case]
+fn test_fail_example() {
+    assert_eq!(0, 1);
+}
 
 #[test_case]
 fn test_example2() {
-    // serial_println!("test_example2");
     assert_eq!(1+1, 2);
-    // serial_println!("ok!");
 }
 
 // RYAN_NOTES: Refactor these tests out of here
@@ -49,22 +44,6 @@ fn test_println_long() {
 //         let screen_char = WRITER.lock().write_char(c).buffer.chars[BUFFER_HEIGHT - 2][i].read();
 //         assert_eq!(char::from(screen_char.ascii_character), c);
 //     }
-// }
-
-fn test_example() -> Result<(), &'static str>{
-    assert_eq!(1+1, 2);
-    Ok(())
-}
-
-// pub fn test_main() {
-//     let tests = [
-//         TestCase{
-//             name: "test_example",
-//             function: test_example,
-//         }
-//     ];
-
-//     run_tests(&tests);
 // }
 
 #[cfg(test)]
@@ -106,28 +85,17 @@ unsafe extern "C" fn kmain() -> ! {
     hlt_loop();
 }
 
-// #[cfg(test)]
-// #[panic_handler]
-// pub fn test_panic(info: &core::panic::PanicInfo) -> ! {
-//     hlt_loop();
-// }
-
-// #[cfg(not(test))]
-// #[panic_handler]
-// fn rust_panic(info: &core::panic::PanicInfo) -> ! {
-//     use hexium_os::utils::registers::*;
-//     panic_log!("{}\n", info);
-//     print_register_dump(&get_registers());
-//     hlt_loop();
-// }
+#[cfg(not(test))]
+#[panic_handler]
+fn panic(info: &PanicInfo) -> ! {
+    use hexium_os::utils::registers::{print_register_dump, get_registers};
+    panic_log!("{}\n", info);
+    print_register_dump(&get_registers());
+    loop {}
+}
 
 #[cfg(test)]
-pub fn test_runner(tests: &[&dyn Testable]) {
-    serial_println!("Running {} tests", tests.len());
-
-    for test in tests {
-        test.run();
-    }
-
-    exit_qemu(QemuExitCode::Success);
+#[panic_handler]
+fn panic(info: &PanicInfo) -> ! {
+    hexium_os::test_panic_handler(info)
 }

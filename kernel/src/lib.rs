@@ -1,8 +1,10 @@
 #![no_std]
 #![no_main]
+// #![cfg_attr(test, no_main)]
 #![feature(abi_x86_interrupt)]
 #![feature(custom_test_frameworks)]
-#![test_runner(test_runner)]
+#![test_runner(crate::test_runner)]
+#![reexport_test_harness_main="test_main"]
 
 extern crate alloc;
 
@@ -22,7 +24,7 @@ pub mod serial;
 pub mod task;
 pub mod utils;
 pub mod writer;
-pub mod tests;
+// pub mod tests;
 
 pub fn init() {
     writer::init();
@@ -85,59 +87,22 @@ pub fn hlt_loop() -> ! {
     }
 }
 
-#[cfg(test)]
-#[panic_handler]
-fn rust_panic(info: &core::panic::PanicInfo) -> ! {
+pub fn test_panic_handler(info: &PanicInfo) -> ! {
+    println!("Test panic handler");
     serial_println!("[failed]");
     serial_println!("Error: {}", info);
     exit_qemu(QemuExitCode::Failed);
-    hlt_loop();
+    loop{}
 }
 
-#[cfg(not(test))]
-#[panic_handler]
-fn rust_panic(info: &core::panic::PanicInfo) -> ! {
-    panic_log!("{}\n", info);
-    print_register_dump(&get_registers());
-    #[cfg(test)]
-    println!("Test");
-    #[cfg(not(test))]
-    println!("Not Test");
-    print!("Main Panic");
-    hlt_loop();
-}
+pub fn test_runner(tests: &[&dyn Testable]) {
+    serial_println!("Running {} tests", tests.len());
 
-// #[cfg(not(test))]
-// #[panic_handler]
-// fn rust_panic(info: &core::panic::PanicInfo) -> ! {
-//     serial_println!("Rust panic");
-//     #[cfg(test)]
-//     test_panic_handler(&info);    
-//     #[cfg(not(test))]
-//     main_panic_handler(&info);
-//     hlt_loop();
-// }
+    for test in tests {
+        test.run();
+    }
 
-// fn main_panic_handler(info: &PanicInfo) {
-//     println!("Main panic handler");
-//     panic_log!("{}\n", info);
-//     print_register_dump(&get_registers());
-//     #[cfg(test)]
-//     println!("Test");
-//     #[cfg(not(test))]
-//     println!("Not Test");
-//     print!("Main Panic");
-// }
-
-// fn test_panic_handler(info: &PanicInfo) {
-//     println!("Test panic handler");
-//     serial_println!("[failed]");
-//     serial_println!("Error: {}", info);
-//     exit_qemu(QemuExitCode::Failed);
-// }
-
-fn test_runner(_test: &[&i32]) {
-    loop {}
+    exit_qemu(QemuExitCode::Success);
 }
 
 
@@ -171,7 +136,15 @@ where T : Fn(),
     }   
 }
 
-// #[panic_handler]
-// fn panic(_info: &PanicInfo) -> ! {
-//     loop {}
-// }
+#[cfg(test)]
+#[unsafe(no_mangle)]
+unsafe extern "C" fn kmain() -> ! {
+    test_main();
+    loop {}
+}
+
+#[cfg(test)]
+#[panic_handler]
+fn panic(info: &PanicInfo) -> ! {
+    test_panic_handler(info)
+}

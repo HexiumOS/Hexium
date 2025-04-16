@@ -24,7 +24,6 @@ pub mod serial;
 pub mod task;
 pub mod utils;
 pub mod writer;
-// pub mod tests;
 
 pub fn init() {
     writer::init();

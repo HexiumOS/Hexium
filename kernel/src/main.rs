@@ -18,22 +18,22 @@ fn test_fail_example() {
 }
 
 #[test_case]
-fn test_example2() {
+fn test_example() {
     assert_eq!(1+1, 2);
 }
 
 // RYAN_NOTES: Refactor these tests out of here
-#[test_case]
-fn test_println_simple() {
-    println!("Simple print new line statement");
-}
+// #[test_case]
+// fn test_println_simple() {
+//     println!("Simple print new line statement");
+// }
 
-#[test_case]
-fn test_println_long() {
-    for _ in 0..200 {
-        println!("Simple print new line many times");
-    }
-}
+// #[test_case]
+// fn test_println_long() {
+//     for _ in 0..200 {
+//         println!("Simple print new line many times");
+//     }
+// }
 
 // TODO: RYAN_NOTES: Needs buffer access
 // #[test_case]

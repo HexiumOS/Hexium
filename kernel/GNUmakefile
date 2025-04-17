@@ -30,16 +30,17 @@ all:
 
 test:
 	RUSTFLAGS="-C relocation-model=static" cargo build --tests --target $(RUST_TARGET) --profile $(RUST_PROFILE)
-	find . -type f -name 'hexium_os-*' ! -name '*.*' -printf '%T@ %p\n' | sort -nr | head -n1 | cut -d' ' -f2-
-	
-	shell find . -type f -name 'hexium_os-*' ! -name '*.*' -printf '%T@ %p\n' | sort -nr | head -n1 | cut -d' ' -f2-
-	echo $(find . -type f -name 'hexium_os-*' ! -name '*.*' -printf '%T@ %p\n' | sort -nr | head -n1 | cut -d' ' -f2-)
-	echo '$(find . -type f -name 'hexium_os-*' ! -name '*.*' -printf '%T@ %p\n' | sort -nr | head -n1 | cut -d' ' -f2-)'
-	echo "$(find . -type f -name 'hexium_os-*' ! -name '*.*' -printf '%T@ %p\n' | sort -nr | head -n1 | cut -d' ' -f2-)"
-	echo $(shell find . -type f -name 'hexium_os-*' ! -name '*.*' -printf '%T@ %p\n' | sort -nr | head -n1 | cut -d' ' -f2-)
-	echo '$(shell find . -type f -name 'hexium_os-*' ! -name '*.*' -printf '%T@ %p\n' | sort -nr | head -n1 | cut -d' ' -f2-)'
-	echo "$(shell find . -type f -name 'hexium_os-*' ! -name '*.*' -printf '%T@ %p\n' | sort -nr | head -n1 | cut -d' ' -f2-)"
-	cp "$(shell find . -type f -name 'hexium_os-*' ! -name '*.*' -printf '%T@ %p\n' | sort -nr | head -n1 | cut -d' ' -f2-)" kernel-test
+
+	mkdir -p kernel-test
+
+	# Collect all hexium_os-* and writer-* executables
+	TEST_BIN_DIR=target/$(RUST_TARGET)/$(RUST_PROFILE_SUBDIR)/deps
+
+	# Copy first two hexium_os-* test binaries
+	find target/$(RUST_TARGET)/$(RUST_PROFILE_SUBDIR)/deps -maxdepth 1 -type f -executable -name 'hexium_os-*' | head -n 2 | xargs -I{} cp {} kernel-test/
+
+	# Copy all writer-* test binaries
+	find target/$(RUST_TARGET)/$(RUST_PROFILE_SUBDIR)/deps -maxdepth 1 -type f -executable -name 'writer-*' -exec cp {} kernel-test/ \;
 
 .PHONY: clean
 clean:

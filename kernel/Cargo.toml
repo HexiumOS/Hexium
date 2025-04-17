@@ -18,3 +18,7 @@ pc-keyboard = "0.7.0"
 x86 = "0.52.0"
 x86_64 = "0.14.2"
 uart_16550 = "0.3.2"
+
+[[test]]
+name="should_panic"
+harness=false

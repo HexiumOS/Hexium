@@ -9,8 +9,7 @@ use core::fmt::Write;
 use hexium_os::writer::WRITER;
 use core::panic::PanicInfo;
 use hexium_os::{boot, hlt_loop, init, panic_log, serial_println, exit_qemu, QemuExitCode, Testable};
-use hexium_os::{info, print, println}; // RYANS_NOTES: Keeping the imports used in the comments further below
-// use crate::{info, print, println};
+use hexium_os::{info, print, println};
 
 #[test_case]
 fn test_fail_example() {
@@ -39,24 +38,16 @@ unsafe extern "C" fn kmain() -> ! {
 unsafe extern "C" fn kmain() -> ! {
     assert!(boot::BASE_REVISION.is_supported());
 
-    init();
-
-    info!("Info in main");
-    
-    panic_log!("Panic log");
-
-    print!("Test2\n");
-
-
-    #[cfg(test)]
-    test_main();
-
-    // RYANS_NOTES: The lines below do not seem to have an effect after the init method above however calling them above the init method causes a bootloop.
+    /* 
+        RYANS_NOTES: The lines below do not seem to have an effect after the init method above 
+        however calling them above the init method causes a boot-loop. 
+        NOTE: Calling them after the init method after the executor code has been commented back in,
+        will cause them not to be run as the executor code seems to block the 'thread'.
+    */ 
     // print!("Test");
     // println!("Test2");
-    // info!("Test3");
-    panic!("Some message");
-    // info!("Test4");
+
+    init();
 
     hlt_loop();
 }

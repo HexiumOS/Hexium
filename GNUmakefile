@@ -28,13 +28,30 @@ run-x86_64: ovmf/ovmf-code-$(KARCH).fd ovmf/ovmf-vars-$(KARCH).fd $(IMAGE_NAME).
 		-cdrom $(IMAGE_NAME).iso \
 		$(QEMUFLAGS)
 
-.PHONY: test-run
-test-run:
-	make test
-	qemu-system-x86_64 hexium_os-x86_64-test.iso -device isa-debug-exit,iobase=0xf4,iosize=0x04 -serial stdio -display none || [ $$? -eq 33 ]
-
 .PHONY: test
-test: $(IMAGE_NAME)-test.iso
+test: test-iso
+	@set -e; \
+	FAILED=0; \
+	echo "\n\n\n--------RUNNING KERNEL INTEGRATION TESTS-------\n\n"; \
+	for iso in hexium_os-tests/*.iso; do \
+		echo "==============================="; \
+		echo "Running integration test: $$iso"; \
+		echo "-------------------------------"; \
+		if qemu-system-x86_64 \
+			-cdrom "$$iso" \
+			-device isa-debug-exit,iobase=0xf4,iosize=0x04 \
+			-serial stdio -display none; \
+		then \
+			echo "✅ Test passed: $$iso"; \
+		elif [ $$? -eq 33 ]; then \
+			echo "✅ Test passed (exit 33): $$iso"; \
+		else \
+			echo "❌ Test failed: $$iso"; \
+			FAILED=1; \
+		fi; \
+		echo ""; \
+	done; \
+	exit $$FAILED
 
 ovmf/ovmf-code-$(KARCH).fd:
 	mkdir -p ovmf
@@ -81,25 +98,27 @@ $(IMAGE_NAME).iso: limine/limine kernel ramfs
 	./limine/limine bios-install $(IMAGE_NAME).iso
 	rm -rf iso_root
 
-# TODO: Use different build folders to avoid cross contamination
-$(IMAGE_NAME)-test.iso: limine/limine kernel-test ramfs
-	rm -rf iso_root
-	mkdir -p iso_root/boot
-	cp -v kernel/kernel-test iso_root/boot/kernel
-	cp -v ramfs.img iso_root/boot/
-	mkdir -p iso_root/boot/limine
-	cp -v limine.conf iso_root/boot/limine/
-	mkdir -p iso_root/EFI/BOOT
-	cp -v limine/limine-bios.sys limine/limine-bios-cd.bin limine/limine-uefi-cd.bin iso_root/boot/limine/
-	cp -v limine/BOOTX64.EFI iso_root/EFI/BOOT/
-	cp -v limine/BOOTIA32.EFI iso_root/EFI/BOOT/
-	xorriso -as mkisofs -b boot/limine/limine-bios-cd.bin \
-		-no-emul-boot -boot-load-size 4 -boot-info-table \
-		--efi-boot boot/limine/limine-uefi-cd.bin \
-		-efi-boot-part --efi-boot-image --protective-msdos-label \
-		iso_root -o $(IMAGE_NAME)-test.iso
-	./limine/limine bios-install $(IMAGE_NAME)-test.iso
-	rm -rf iso_root
+.PHONY: test-iso
+test-iso: limine/limine ramfs kernel-test
+	mkdir -p hexium_os-tests
+	for testbin in kernel/kernel-test/*; do \
+		testname=$$(basename $$testbin); \
+		isodir=iso_root_$$testname; \
+		mkdir -p $$isodir/boot/limine $$isodir/EFI/BOOT; \
+		cp -v $$testbin $$isodir/boot/kernel; \
+		cp -v ramfs.img $$isodir/boot/; \
+		cp -v limine.conf $$isodir/boot/limine/; \
+		cp -v limine/limine-bios.sys limine/limine-bios-cd.bin limine/limine-uefi-cd.bin $$isodir/boot/limine/; \
+		cp -v limine/BOOTX64.EFI $$isodir/EFI/BOOT/; \
+		cp -v limine/BOOTIA32.EFI $$isodir/EFI/BOOT/; \
+		xorriso -as mkisofs -b boot/limine/limine-bios-cd.bin \
+			-no-emul-boot -boot-load-size 4 -boot-info-table \
+			--efi-boot boot/limine/limine-uefi-cd.bin \
+			-efi-boot-part --efi-boot-image --protective-msdos-label \
+			$$isodir -o hexium_os-tests/hexium_os-$$testname.iso; \
+		./limine/limine bios-install hexium_os-tests/hexium_os-$$testname.iso; \
+		rm -rf $$isodir; \
+	done
 
 .PHONY: clean
 clean:

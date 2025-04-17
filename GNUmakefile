@@ -42,11 +42,11 @@ test: test-iso
 			-device isa-debug-exit,iobase=0xf4,iosize=0x04 \
 			-serial stdio -display none; \
 		then \
-			echo "✅ Test passed: $$iso"; \
+			echo "✅ Integration Test passed: $$iso"; \
 		elif [ $$? -eq 33 ]; then \
-			echo "✅ Test passed (exit 33): $$iso"; \
+			echo "✅ Integration Test passed (exit 33): $$iso"; \
 		else \
-			echo "❌ Test failed: $$iso"; \
+			echo "❌ Integration Test failed: $$iso"; \
 			FAILED=1; \
 		fi; \
 		echo ""; \

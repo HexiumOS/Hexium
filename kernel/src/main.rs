@@ -22,30 +22,6 @@ fn test_example() {
     assert_eq!(1+1, 2);
 }
 
-// RYAN_NOTES: Refactor these tests out of here
-// #[test_case]
-// fn test_println_simple() {
-//     println!("Simple print new line statement");
-// }
-
-// #[test_case]
-// fn test_println_long() {
-//     for _ in 0..200 {
-//         println!("Simple print new line many times");
-//     }
-// }
-
-// TODO: RYAN_NOTES: Needs buffer access
-// #[test_case]
-// fn test_println_output() {
-//     let s = "Some test fitting single line";
-//     println!("{}", s);
-//     for (i, c) in s.chars().enumerate() {
-//         let screen_char = WRITER.lock().write_char(c).buffer.chars[BUFFER_HEIGHT - 2][i].read();
-//         assert_eq!(char::from(screen_char.ascii_character), c);
-//     }
-// }
-
 #[cfg(test)]
 #[unsafe(no_mangle)]
 unsafe extern "C" fn kmain() -> ! {

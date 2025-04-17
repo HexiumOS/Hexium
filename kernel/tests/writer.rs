@@ -6,11 +6,12 @@
 
 use core::panic::PanicInfo;
 
-use hexium_os::println;
+use hexium_os::{println, init};
 // use hexium_os::writer::*;
 
 #[unsafe(no_mangle)]
 unsafe extern "C" fn kmain() -> ! {
+    init(); // RYAN_NOTES: Not sure why it's absence causes an loop running of test_println_long test.
   test_main();
   loop{}
 }

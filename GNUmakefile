@@ -124,6 +124,7 @@ test-iso: limine/limine ramfs kernel-test
 clean:
 	$(MAKE) -C kernel clean
 	rm -rf iso_root *.iso
+	rm -rf hexium_os-tests
 
 .PHONY: distclean
 distclean: clean

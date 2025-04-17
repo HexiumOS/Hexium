@@ -39,8 +39,8 @@ test:
 	# Copy first two hexium_os-* test binaries
 	find target/$(RUST_TARGET)/$(RUST_PROFILE_SUBDIR)/deps -maxdepth 1 -type f -executable -name 'hexium_os-*' | head -n 2 | xargs -I{} cp {} kernel-test/
 
-	# Copy all writer-* test binaries
-	find target/$(RUST_TARGET)/$(RUST_PROFILE_SUBDIR)/deps -maxdepth 1 -type f -executable -name 'writer-*' -exec cp {} kernel-test/ \;
+	# Copy all test binaries except hexium_os-*
+	find target/$(RUST_TARGET)/$(RUST_PROFILE_SUBDIR)/deps -maxdepth 1 -type f -executable ! -name 'hexium_os-*' -exec cp {} kernel-test/ \;
 
 .PHONY: clean
 clean:

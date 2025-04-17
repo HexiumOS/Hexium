@@ -33,13 +33,10 @@ test:
 
 	mkdir -p kernel-test
 
-	# Collect all hexium_os-* and writer-* executables
-	TEST_BIN_DIR=target/$(RUST_TARGET)/$(RUST_PROFILE_SUBDIR)/deps
-
-	# Copy first two hexium_os-* test binaries
+	# Copy first two hexium_os-* test binaries - the third appears to be a normal build exec.
 	find target/$(RUST_TARGET)/$(RUST_PROFILE_SUBDIR)/deps -maxdepth 1 -type f -executable -name 'hexium_os-*' | head -n 2 | xargs -I{} cp {} kernel-test/
 
-	# Copy all test binaries except hexium_os-*
+	# Copy all remain integration test binaries except hexium_os-*
 	find target/$(RUST_TARGET)/$(RUST_PROFILE_SUBDIR)/deps -maxdepth 1 -type f -executable ! -name 'hexium_os-*' -exec cp {} kernel-test/ \;
 
 .PHONY: clean

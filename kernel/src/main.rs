@@ -4,12 +4,8 @@
 #![test_runner(hexium_os::test_runner)]
 #![reexport_test_harness_main = "test_main"]
 
-use core::fmt::Write;
-
-use hexium_os::writer::WRITER;
 use core::panic::PanicInfo;
-use hexium_os::{boot, hlt_loop, init, panic_log, serial_println, exit_qemu, QemuExitCode, Testable};
-use hexium_os::{info, print, println};
+use hexium_os::{boot, hlt_loop, init, panic_log};
 
 #[test_case]
 fn test_example() {

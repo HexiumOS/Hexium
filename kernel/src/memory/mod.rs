@@ -10,7 +10,7 @@ pub mod paging;
 static PHYS_MEM_OFFSET: Once<VirtAddr> = Once::new();
 static mut MEM_MAPPER: Option<OffsetPageTable<'static>> = None;
 
-pub fn init() -> () {
+pub fn init() {
     if let Some(hhdm_response) = boot::HHDM_REQUEST.get_response() {
         PHYS_MEM_OFFSET.call_once(|| VirtAddr::new(hhdm_response.offset()));
     }

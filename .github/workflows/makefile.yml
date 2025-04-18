@@ -28,5 +28,5 @@ jobs:
     - name: Verify xorriso installation
       run: xorriso -version
 
-    - name: Run build
-      run: make
+    - name: Run build & test
+      run: make test

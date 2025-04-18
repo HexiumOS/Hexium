@@ -31,17 +31,14 @@ pub fn init() {
 
     let mut vfs = fs::vfs::VFS::new(None);
     fs::ramfs::init(&mut vfs);
-    
-    info!("Before");
-    print_startup_message(&mut vfs);
-    info!("After");
 
-    // RYAN_NOTES: Commented out for now as the code doesn't run past this section. Will return it back.
+    print_startup_message(&mut vfs);
+
+    // Issue#30: Commented out for now as the code doesn't run past this section. Will return it back.
     // let mut executor = crate::task::executor::Executor::new();
     // let _ = executor.spawn(crate::task::Task::new(devices::keyboard::trace_keypresses()));
     // executor.run();
 
-    info!("After2");
     //vfs.unmount_fs();
 }
 
@@ -59,8 +56,6 @@ fn print_startup_message(vfs: &mut fs::vfs::VFS) -> [u8; 128] {
             error!("File not found: {}", err);
         }
     }
-
-    info!("Testing");
 
     info!(
         "Hexium OS kernel v{} succesfully initialized at {}",
@@ -86,7 +81,6 @@ pub fn hlt_loop() -> ! {
 }
 
 pub fn test_panic_handler(info: &PanicInfo) -> ! {
-    println!("Test panic handler");
     serial_println!("[failed]");
     serial_println!("Error: {}", info);
     exit_qemu(QemuExitCode::Failed);

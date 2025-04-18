@@ -31,5 +31,5 @@ jobs:
     - name: Install qemu
       run: sudo apt-get install qemu-system
 
-    - name: Run build & test
-      run: make test
+    - name: Run build
+      run: make

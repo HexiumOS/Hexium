@@ -28,5 +28,8 @@ jobs:
     - name: Verify xorriso installation
       run: xorriso -version
 
+    - name: Install qemu
+      run: sudo apt-get install qemu-system
+
     - name: Run build & test
       run: make test

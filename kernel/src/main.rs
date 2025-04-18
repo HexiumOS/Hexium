@@ -12,11 +12,6 @@ use hexium_os::{boot, hlt_loop, init, panic_log, serial_println, exit_qemu, Qemu
 use hexium_os::{info, print, println};
 
 #[test_case]
-fn test_fail_example() {
-    assert_eq!(0, 1);
-}
-
-#[test_case]
 fn test_example() {
     assert_eq!(1+1, 2);
 }
@@ -24,12 +19,9 @@ fn test_example() {
 #[cfg(test)]
 #[unsafe(no_mangle)]
 unsafe extern "C" fn kmain() -> ! {
-    // info!("Test Main");
     assert!(boot::BASE_REVISION.is_supported());
     init();
-    info!("Test Main:1");
     test_main();
-    info!("Test Main:2");
     loop {}
 }
 
@@ -39,13 +31,13 @@ unsafe extern "C" fn kmain() -> ! {
     assert!(boot::BASE_REVISION.is_supported());
 
     /* 
-        RYANS_NOTES: The lines below do not seem to have an effect after the init method above 
+        Issue#30: The lines at the end of this comment below do not seem to have an effect after the init method above 
         however calling them above the init method causes a boot-loop. 
         NOTE: Calling them after the init method after the executor code has been commented back in,
         will cause them not to be run as the executor code seems to block the 'thread'.
+        print!("Test");
+        println!("Test2");
     */ 
-    // print!("Test");
-    // println!("Test2");
 
     init();
 

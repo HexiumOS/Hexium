@@ -7,11 +7,10 @@
 use core::panic::PanicInfo;
 
 use hexium_os::{println, init};
-// use hexium_os::writer::*;
 
 #[unsafe(no_mangle)]
 unsafe extern "C" fn kmain() -> ! {
-    init(); // RYAN_NOTES: Not sure why it's absence causes an loop running of test_println_long test.
+    init(); // Issue#30: Not sure why it's absence causes an loop running of test_println_long test.
   test_main();
   loop{}
 }
@@ -41,7 +40,7 @@ fn test_println_long_more() {
     }
 }
 
-// TODO: RYAN_NOTES: Needs buffer access
+// TODO: Issue#31: Needs buffer access
 // #[test_case]
 // fn test_println_output() {
 //     let s = "Some test fitting single line";

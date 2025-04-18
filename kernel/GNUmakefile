@@ -29,15 +29,19 @@ all:
 	cp target/$(RUST_TARGET)/$(RUST_PROFILE_SUBDIR)/hexium_os kernel
 
 test:
-	RUSTFLAGS="-C relocation-model=static" cargo build --tests --target $(RUST_TARGET) --profile $(RUST_PROFILE)
-
 	mkdir -p kernel-test
+	RUSTFLAGS="-C relocation-model=static" cargo test --no-run --target $(RUST_TARGET) --profile $(RUST_PROFILE) --color always \
+		2>&1 | tee .test-log.txt
+	@grep -o 'target/[^ )]*' .test-log.txt | while read -r path; do \
+		if [ -x "$$path" ]; then \
+			echo "Copying $$path to kernel-test/"; \
+			cp "$$path" kernel-test/; \
+		else \
+			echo "Skipping non-executable: $$path"; \
+		fi \
+	done
 
-	# Copy first two hexium_os-* test binaries - the third appears to be a normal build exec.
-	find target/$(RUST_TARGET)/$(RUST_PROFILE_SUBDIR)/deps -maxdepth 1 -type f -executable -name 'hexium_os-*' | head -n 2 | xargs -I{} cp {} kernel-test/
-
-	# Copy all remain integration test binaries except hexium_os-*
-	find target/$(RUST_TARGET)/$(RUST_PROFILE_SUBDIR)/deps -maxdepth 1 -type f -executable ! -name 'hexium_os-*' -exec cp {} kernel-test/ \;
+	@rm .test-log.txt
 
 .PHONY: clean
 clean:

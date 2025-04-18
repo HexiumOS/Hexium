@@ -1,4 +1,3 @@
-use crate::serial_print;
 use crate::{utils::types::option_to_c_void, boot};
 use core::fmt;
 use core::ptr;
@@ -92,8 +91,8 @@ macro_rules! print {
 
 #[macro_export]
 macro_rules! println {
-    () => (print!("\n"));
-    ($($arg:tt)*) => (crate::print!("{}\n", format_args!($($arg)*)));
+    () => ($crate::print!("\n"));
+    ($($arg:tt)*) => ($crate::print!("{}\n", format_args!($($arg)*)));
 }
 
 #[doc(hidden)]
@@ -103,6 +102,5 @@ pub fn _print(args: fmt::Arguments) {
 
     interrupts::without_interrupts(|| {
         WRITER.lock().write_fmt(args).unwrap();
-        serial_print!("{}", args);
     });
 }

@@ -9,7 +9,6 @@ extern crate alloc;
 
 use alloc::string::String;
 use core::{arch::asm, panic::PanicInfo};
-use utils::registers::{get_registers, print_register_dump};
 
 pub mod boot;
 pub mod devices;
@@ -115,13 +114,13 @@ pub fn exit_qemu(exit_code: QemuExitCode) {
 }
 
 pub trait Testable {
-    fn run(&self) -> ();
+    fn run(&self);
 }
 
 impl<T> Testable for T
 where T : Fn(),
 {
-    fn run(&self) -> () {
+    fn run(&self) {
         serial_print!("{}...\t", core::any::type_name::<T>());
         self();
         serial_println!("[ok]");

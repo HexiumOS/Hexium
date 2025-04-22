@@ -96,10 +96,10 @@ pub async fn trace_keypresses() {
             if let Some(key) = keyboard.process_keyevent(key_event) {
                 match key {
                     DecodedKey::Unicode(character) => {
-                        trace!("Received keyboard interrupt with key: {}\n", character)
+                        trace!("Received keyboard interrupt with key: {}", character)
                     }
                     DecodedKey::RawKey(key) => {
-                        trace!("Received keyboard interrupt with key: {:?}\n", key)
+                        trace!("Received keyboard interrupt with key: {:?}", key)
                     }
                 }
             }

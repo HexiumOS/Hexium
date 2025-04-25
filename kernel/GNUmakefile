@@ -28,10 +28,26 @@ all:
 	RUSTFLAGS="-C relocation-model=static" cargo build --target $(RUST_TARGET) --profile $(RUST_PROFILE)
 	cp target/$(RUST_TARGET)/$(RUST_PROFILE_SUBDIR)/hexium_os kernel
 
+test:
+	mkdir -p kernel-test
+	RUSTFLAGS="-C relocation-model=static" cargo test --no-run --target $(RUST_TARGET) --profile $(RUST_PROFILE) --color always \
+		2>&1 | tee .test-log.txt
+	@grep -o 'target/[^ )]*' .test-log.txt | while read -r path; do \
+		if [ -x "$$path" ]; then \
+			echo "Copying $$path to kernel-test/"; \
+			cp "$$path" kernel-test/; \
+		else \
+			echo "Skipping non-executable: $$path"; \
+		fi \
+	done
+
+	@rm .test-log.txt
+
 .PHONY: clean
 clean:
 	cargo clean
 	rm -rf kernel
+	rm -rf kernel-test
 
 .PHONY: distclean
 distclean: clean

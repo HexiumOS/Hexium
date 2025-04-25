@@ -1,2 +1,4 @@
 /kernel
 /target
+/kernel-test
+.test-log.txt

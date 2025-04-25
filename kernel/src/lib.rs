@@ -1,10 +1,14 @@
 #![no_std]
+#![no_main]
 #![feature(abi_x86_interrupt)]
+#![feature(custom_test_frameworks)]
+#![test_runner(crate::test_runner)]
+#![reexport_test_harness_main="test_main"]
 
 extern crate alloc;
 
 use alloc::string::String;
-use core::arch::asm;
+use core::{arch::asm, panic::PanicInfo};
 
 pub mod boot;
 pub mod devices;
@@ -26,11 +30,13 @@ pub fn init() {
 
     let mut vfs = fs::vfs::VFS::new(None);
     fs::ramfs::init(&mut vfs);
+
     print_startup_message(&mut vfs);
 
-    let mut executor = crate::task::executor::Executor::new();
-    let _ = executor.spawn(crate::task::Task::new(devices::keyboard::trace_keypresses()));
-    executor.run();
+    // Issue#30: Commented out for now as the code doesn't run past this section. Will return it back.
+    // let mut executor = crate::task::executor::Executor::new();
+    // let _ = executor.spawn(crate::task::Task::new(devices::keyboard::trace_keypresses()));
+    // executor.run();
 
     //vfs.unmount_fs();
 }
@@ -42,16 +48,16 @@ fn print_startup_message(vfs: &mut fs::vfs::VFS) -> [u8; 128] {
         Ok(vnode) => match vfs.read_file(&vnode, &mut buffer, 0) {
             Ok(_bytes_read) => {}
             Err(err) => {
-                error!("Error reading file: {}\n", err);
+                error!("Error reading file: {}", err);
             }
         },
         Err(err) => {
-            error!("File not found: {}\n", err);
+            error!("File not found: {}", err);
         }
     }
 
     info!(
-        "Hexium OS kernel v{} succesfully initialized at {}\n",
+        "Hexium OS kernel v{} succesfully initialized at {}",
         env!("CARGO_PKG_VERSION"),
         unsafe { rtc::read_rtc() }
     );
@@ -71,4 +77,65 @@ pub fn hlt_loop() -> ! {
             asm!("idle 0");
         }
     }
+}
+
+pub fn test_panic_handler(info: &PanicInfo) -> ! {
+    serial_println!("[failed]");
+    serial_println!("Error: {}", info);
+    exit_qemu(QemuExitCode::Failed);
+    loop{}
+}
+
+pub fn test_runner(tests: &[&dyn Testable]) {
+    serial_println!("Running {} tests", tests.len());
+
+    for test in tests {
+        test.run();
+    }
+
+    exit_qemu(QemuExitCode::Success);
+}
+
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(u32)]
+pub enum QemuExitCode {
+    Success = 0x10,
+    Failed = 0x11,
+}
+
+pub fn exit_qemu(exit_code: QemuExitCode) {
+    use x86_64::instructions::port::Port;
+
+    unsafe {
+        let mut port = Port::new(0xf4);
+        port.write(exit_code as u32);
+    }
+}
+
+pub trait Testable {
+    fn run(&self);
+}
+
+impl<T> Testable for T
+where T : Fn(),
+{
+    fn run(&self) {
+        serial_print!("{}...\t", core::any::type_name::<T>());
+        self();
+        serial_println!("[ok]");
+    }   
+}
+
+#[cfg(test)]
+#[unsafe(no_mangle)]
+unsafe extern "C" fn kmain() -> ! {
+    test_main();
+    loop {}
+}
+
+#[cfg(test)]
+#[panic_handler]
+fn panic(info: &PanicInfo) -> ! {
+    test_panic_handler(info)
 }

@@ -81,7 +81,7 @@ pub fn get_registers() -> Registers {
         // Segment Registers
         asm!(
             "mov {0:x}, cs",
-            "mov {1:x}, ds", 
+            "mov {1:x}, ds",
             "mov {2:x}, es",
             "mov {3:x}, fs",
             "mov {4:x}, gs",
@@ -177,7 +177,6 @@ macro_rules! print_segment_pair {
 
 pub fn print_register_dump(regs: &Registers) {
     use crate::println;
-    println!("\nRegister Dump:");
     println!("┌─────────────────────────┬─────────────────────────┐");
 
     // General Purpose Registers

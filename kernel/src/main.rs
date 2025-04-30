@@ -1,7 +1,7 @@
 #![no_std]
 #![no_main]
 
-use hexium_os::{boot, hlt_loop, init, panic_log};
+use hexium_os::{boot, hlt_loop, init, print};
 
 #[unsafe(no_mangle)]
 unsafe extern "C" fn kmain() -> ! {
@@ -15,7 +15,20 @@ unsafe extern "C" fn kmain() -> ! {
 #[panic_handler]
 fn rust_panic(info: &core::panic::PanicInfo) -> ! {
     use hexium_os::utils::registers::*;
-    panic_log!("{}\n", info);
+    print!("\n\n");
+    let location = info.location().unwrap();
+
+    print!("Message: {}\n\n", info.message());
+    print!(
+        "Location: {}:{}:{}\n\n",
+        location.file(),
+        location.line(),
+        location.column()
+    );
+    print!("Register dump:\n");
     print_register_dump(&get_registers());
+    print!("Stack trace:\nUnknown\n\n");
+    print!("System halted.\n\n");
+
     hlt_loop();
 }

@@ -3,7 +3,7 @@
 #![feature(abi_x86_interrupt)]
 #![feature(custom_test_frameworks)]
 #![test_runner(crate::test_runner)]
-#![reexport_test_harness_main="test_main"]
+#![reexport_test_harness_main = "test_main"]
 
 extern crate alloc;
 
@@ -14,6 +14,7 @@ pub mod boot;
 pub mod devices;
 pub mod drivers;
 pub mod fs;
+pub mod hal;
 pub mod interrupts;
 pub mod log;
 pub mod memory;
@@ -27,6 +28,7 @@ pub fn init() {
     writer::init();
     interrupts::init();
     memory::init();
+    hal::init(); // Requires `memory` to be initialized first
 
     let mut vfs = fs::vfs::VFS::new(None);
     fs::ramfs::init(&mut vfs);
@@ -83,7 +85,7 @@ pub fn test_panic_handler(info: &PanicInfo) -> ! {
     serial_println!("[failed]");
     serial_println!("Error: {}", info);
     exit_qemu(QemuExitCode::Failed);
-    loop{}
+    loop {}
 }
 
 pub fn test_runner(tests: &[&dyn Testable]) {
@@ -95,7 +97,6 @@ pub fn test_runner(tests: &[&dyn Testable]) {
 
     exit_qemu(QemuExitCode::Success);
 }
-
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u32)]
@@ -118,13 +119,14 @@ pub trait Testable {
 }
 
 impl<T> Testable for T
-where T : Fn(),
+where
+    T: Fn(),
 {
     fn run(&self) {
         serial_print!("{}...\t", core::any::type_name::<T>());
         self();
         serial_println!("[ok]");
-    }   
+    }
 }
 
 #[cfg(test)]

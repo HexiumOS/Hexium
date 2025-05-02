@@ -1,4 +1,4 @@
-use crate::{utils::types::option_to_c_void, boot};
+use crate::{boot, utils::types::option_to_c_void};
 use core::fmt;
 use core::ptr;
 use lazy_static::lazy_static;
@@ -79,7 +79,7 @@ impl Writer {
 impl fmt::Write for Writer {
     fn write_str(&mut self, s: &str) -> fmt::Result {
         self.write_string(s);
-        
+
         Ok(())
     }
 }

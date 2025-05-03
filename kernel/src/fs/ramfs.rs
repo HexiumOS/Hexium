@@ -64,7 +64,7 @@ pub fn init(vfs: &Vfs) {
             core::slice::from_raw_parts(modules[0].addr() as *const u8, modules[0].size() as usize)
         };
         let ramfs = RamFs::new(archive);
-        vfs.mount("/", Arc::new(ramfs));
+        vfs.mount("/ramdisk", Arc::new(ramfs));
     }
 }
 

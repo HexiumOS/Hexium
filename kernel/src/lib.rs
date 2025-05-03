@@ -45,7 +45,7 @@ pub fn init() {
 fn print_startup_message(vfs: &hal::vfs::Vfs) -> [u8; 128] {
     let mut buffer = [0u8; 128];
 
-    match vfs.lookuppn("/./welcome.txt") {
+    match vfs.lookuppn("/ramdisk/./welcome.txt") {
         Ok(vnode) => {
             // Use the known buffer size directly instead of calling len()
             match vnode.ops.read(&vnode, &mut buffer, 0, 128) {

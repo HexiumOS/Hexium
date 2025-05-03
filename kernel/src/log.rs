@@ -13,20 +13,43 @@ pub enum LogLevel {
 // Define a macro that accepts the log level and message.
 #[macro_export]
 macro_rules! log {
-    // Log level and a formatted message
     ($level:expr, $($arg:tt)*) => {{
-        let (label, color_code) = match $level {
-            $crate::log::LogLevel::None => ("NONE ", "\x1b[90m"),  // Bright Black (Gray), if needed
-            $crate::log::LogLevel::Trace => ("TRACE", "\x1b[95m"), // Bright Magenta
-            $crate::log::LogLevel::Debug => ("DEBUG", "\x1b[94m"), // Bright Blue
-            $crate::log::LogLevel::Info => ("INFO ", "\x1b[92m"),  // Bright Green
-            $crate::log::LogLevel::Warn => ("WARN ", "\x1b[93m"),  // Bright Yellow
-            $crate::log::LogLevel::Error => ("ERROR", "\x1b[91m"), // Bright Red
-            $crate::log::LogLevel::Fatal => ("FATAL", "\x1b[91m"), // Bright Red (same as ERROR)
-            $crate::log::LogLevel::Panic => ("PANIC", "\x1b[97;41m"), // White text on Red background
+        let (label, color_code, show_location) = match $level {
+            $crate::log::LogLevel::None  => ("NONE ", "\x1b[90m", false),
+            $crate::log::LogLevel::Trace => ("TRACE", "\x1b[95m", false),
+            $crate::log::LogLevel::Debug => ("DEBUG", "\x1b[94m", false),
+            $crate::log::LogLevel::Info  => ("INFO ", "\x1b[92m", false),
+
+            $crate::log::LogLevel::Warn => {
+                #[cfg(debug_assertions)]
+                { ("WARN ", "\x1b[93m", true) }
+
+                #[cfg(not(debug_assertions))]
+                { ("WARN ", "\x1b[93m", false) }
+            }
+
+            $crate::log::LogLevel::Error => ("ERROR", "\x1b[91m", true),
+            $crate::log::LogLevel::Fatal => ("FATAL", "\x1b[91m", true),
+            $crate::log::LogLevel::Panic => ("PANIC", "\x1b[97;41m", true),
         };
 
-        $crate::println!("{}[{}]\x1b[0m {}", color_code, label, format_args!($($arg)*));
+        if show_location {
+            $crate::println!(
+                "{}[{}]\x1b[0m {}:{}: {}",
+                color_code,
+                label,
+                file!(),
+                line!(),
+                format_args!($($arg)*)
+            );
+        } else {
+            $crate::println!(
+                "{}[{}]\x1b[0m {}",
+                color_code,
+                label,
+                format_args!($($arg)*)
+            );
+        }
     }};
 }
 
@@ -44,7 +67,7 @@ macro_rules! debug {
         {
             $crate::log!($crate::log::LogLevel::Debug, $($arg)*);
         }
-        
+
         #[cfg(not(debug_assertions))]
         {}
     };

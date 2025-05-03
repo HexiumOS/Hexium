@@ -6,13 +6,6 @@ use alloc::{
 };
 use spin::RwLock;
 
-pub fn init() {
-    // For testing purposes, we can create a dummy VFS instance
-    let _vfs = Vfs::new();
-
-    trace!("VFS initialized");
-}
-
 #[derive(Debug)]
 pub enum VfsError {
     NotFound,

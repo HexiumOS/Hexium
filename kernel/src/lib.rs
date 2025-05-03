@@ -28,7 +28,6 @@ pub fn init() {
     writer::init();
     interrupts::init();
     memory::init();
-    hal::init(); // Requires `memory` to be initialized first
 
     let mut vfs = hal::vfs::Vfs::new();
     fs::ramfs::init(&vfs);

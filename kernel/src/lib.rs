@@ -36,9 +36,9 @@ pub fn init() {
     print_startup_message(&mut vfs);
 
     // Issue#30: Commented out for now as the code doesn't run past this section. Will return it back.
-    // let mut executor = crate::task::executor::Executor::new();
-    // let _ = executor.spawn(crate::task::Task::new(devices::keyboard::trace_keypresses()));
-    // executor.run();
+    //let mut executor = crate::task::executor::Executor::new();
+    //let _ = executor.spawn(crate::task::Task::new(devices::keyboard::trace_keypresses()));
+    //executor.run();
 
     //vfs.unmount_fs();
 }

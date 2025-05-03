@@ -3,8 +3,11 @@ use crate::{
     hal::vfs::{Vfs, VfsError, Vnode, VnodeOps, VnodeType},
     print, trace, utils,
 };
-use alloc::string::{String, ToString};
 use alloc::sync::Arc;
+use alloc::{
+    format,
+    string::{String, ToString},
+};
 
 pub struct RamFs {
     archive: &'static [u8],
@@ -74,6 +77,13 @@ pub fn tar_lookup<'a>(
 ) -> Option<(usize, &'a [u8], VnodeType)> {
     let mut ptr = 0;
 
+    // Ensure filename starts with "./"
+    let normalized_filename = if filename.starts_with("./") {
+        filename.to_string()
+    } else {
+        format!("./{}", filename)
+    };
+
     while ptr + 257 < archive.len() {
         if &archive[ptr + 257..ptr + 262] != b"ustar" {
             break;
@@ -92,7 +102,7 @@ pub fn tar_lookup<'a>(
 
         let filesize = utils::octal_to_binrary(&archive[ptr + 124..ptr + 135]);
 
-        if file_name == filename.as_bytes() {
+        if file_name == normalized_filename.as_bytes() {
             return Some((
                 filesize as usize,
                 &archive[ptr + 512..ptr + 512 + filesize as usize],

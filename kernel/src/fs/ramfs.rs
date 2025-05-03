@@ -1,62 +1,55 @@
 use crate::{
-    boot, fs::vfs::{FileSystem, FileType, VNode, VFS}, info, print, trace, utils
+    boot,
+    hal::vfs::{Vfs, VfsError, Vnode, VnodeOps, VnodeType},
+    print, trace, utils,
 };
-use alloc::boxed::Box;
 use alloc::string::{String, ToString};
+use alloc::sync::Arc;
 
 pub struct RamFs {
-    //files: Vec<VNode>,
     archive: &'static [u8],
 }
 
 impl RamFs {
     pub fn new(archive: &'static [u8]) -> Self {
-        RamFs {
-            //files: Vec::new(),
-            archive,
-        }
+        RamFs { archive }
     }
 }
 
-impl FileSystem for RamFs {
-    fn mount(&mut self, _path: &str) -> Result<(), ()> {
-        info!("RamFs mounted");
-        Ok(())
-    }
-
-    fn unmount(&mut self) -> Result<(), String> {
-        info!("RamFs unmounted");
-        Ok(())
-    }
-
-    fn open(&self, path: &str) -> Result<VNode, String> {
-        if let Some((_size, _content)) = tar_lookup(self.archive, path) {
-            Ok(VNode::new(path.to_string(), FileType::File))
-        } else {
-            Err("File not found".to_string())
+impl VnodeOps for RamFs {
+    fn lookup(&self, path: &str) -> Result<Vnode, VfsError> {
+        match tar_lookup(self.archive, path) {
+            Some((_size, _content, vtype)) => Ok(Vnode {
+                name: path.to_string(),
+                vtype,
+                ops: Arc::new(RamFs::new(self.archive)),
+            }),
+            None => Err(VfsError::NotFound),
         }
     }
 
-    fn read(&self, file: &VNode, buf: &mut [u8], offset: usize) -> Result<usize, String> {
-        if let Some((_size, content)) = tar_lookup(self.archive, &file.file_name) {
-            let len = buf.len().min(content.len().saturating_sub(offset));
-            buf[..len].copy_from_slice(&content[offset..offset + len]);
+    fn read(
+        &self,
+        file: &Vnode,
+        buf: &mut [u8],
+        offset: usize,
+        _length: usize,
+    ) -> Result<usize, String> {
+        if let Some((size, content, _)) = tar_lookup(self.archive, &file.name) {
+            let start = offset.min(size);
+            let end = (offset + buf.len()).min(size);
+            let len = end - start;
+            if len > 0 {
+                buf[..len].copy_from_slice(&content[start..end]);
+            }
             Ok(len)
         } else {
             Err("File not found".to_string())
         }
     }
-
-    fn write(&mut self, _file: &VNode, _buf: &[u8], _offset: usize) -> Result<usize, String> {
-        Err("Write operation not supported".to_string())
-    }
-
-    fn create(&mut self, _path: &str, _file_type: FileType) -> Result<VNode, String> {
-        Err("Create operation not supported".to_string())
-    }
 }
 
-pub fn init(vfs: &mut VFS) {
+pub fn init(vfs: &Vfs) {
     if let Some(module_response) = boot::MODULE_REQUEST.get_response() {
         let modules = module_response.modules();
         if !modules.is_empty() {
@@ -68,17 +61,17 @@ pub fn init(vfs: &mut VFS) {
         }
 
         let archive = unsafe {
-            core::slice::from_raw_parts(
-                modules[0].addr() as *const u8,
-                (modules[0].size() as u64).try_into().unwrap(),
-            )
+            core::slice::from_raw_parts(modules[0].addr() as *const u8, modules[0].size() as usize)
         };
-        let ramfs = Box::new(RamFs::new(archive));
-        vfs.mount_fs(ramfs);
+        let ramfs = RamFs::new(archive);
+        vfs.mount("/", Arc::new(ramfs));
     }
 }
 
-pub fn tar_lookup<'a>(archive: &'a [u8], filename: &str) -> Option<(usize, &'a [u8])> {
+pub fn tar_lookup<'a>(
+    archive: &'a [u8],
+    filename: &'a str,
+) -> Option<(usize, &'a [u8], VnodeType)> {
     let mut ptr = 0;
 
     while ptr + 257 < archive.len() {
@@ -90,16 +83,24 @@ pub fn tar_lookup<'a>(archive: &'a [u8], filename: &str) -> Option<(usize, &'a [
         let name_len = header_filename.iter().position(|&x| x == 0).unwrap_or(100);
         let file_name = &header_filename[..name_len];
 
+        let typeflag = archive[ptr + 156];
+        let vtype = if typeflag == b'5' {
+            VnodeType::Directory
+        } else {
+            VnodeType::Regular
+        };
+
         let filesize = utils::octal_to_binrary(&archive[ptr + 124..ptr + 135]);
 
         if file_name == filename.as_bytes() {
             return Some((
                 filesize as usize,
                 &archive[ptr + 512..ptr + 512 + filesize as usize],
+                vtype,
             ));
         }
 
-        ptr = ptr + ((((filesize as usize) + 511) / 512) + 1) * 512;
+        ptr += (((filesize as usize + 511) / 512) + 1) * 512;
     }
     None
 }

@@ -30,8 +30,8 @@ pub fn init() {
     memory::init();
     hal::init(); // Requires `memory` to be initialized first
 
-    let mut vfs = fs::vfs::VFS::new(None);
-    fs::ramfs::init(&mut vfs);
+    let mut vfs = hal::vfs::Vfs::new();
+    fs::ramfs::init(&vfs);
 
     print_startup_message(&mut vfs);
 
@@ -43,23 +43,26 @@ pub fn init() {
     //vfs.unmount_fs();
 }
 
-fn print_startup_message(vfs: &mut fs::vfs::VFS) -> [u8; 128] {
+fn print_startup_message(vfs: &hal::vfs::Vfs) -> [u8; 128] {
     let mut buffer = [0u8; 128];
 
-    match vfs.open_file("./welcome.txt") {
-        Ok(vnode) => match vfs.read_file(&vnode, &mut buffer, 0) {
-            Ok(_bytes_read) => {}
-            Err(err) => {
-                error!("Error reading file: {}", err);
+    match vfs.lookuppn("./welcome.txt") {
+        Ok(vnode) => {
+            // Use the known buffer size directly instead of calling len()
+            match vnode.ops.read(&vnode, &mut buffer, 0, 128) {
+                Ok(_bytes_read) => {}
+                Err(err) => {
+                    error!("Error reading file: {}", err);
+                }
             }
-        },
+        }
         Err(err) => {
-            error!("File not found: {}", err);
+            error!("File error: {:?}", err);
         }
     }
 
     info!(
-        "Hexium OS kernel v{} succesfully initialized at {}",
+        "Hexium OS kernel v{} successfully initialized at {}",
         env!("CARGO_PKG_VERSION"),
         unsafe { rtc::read_rtc() }
     );

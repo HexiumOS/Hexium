@@ -86,7 +86,10 @@ impl fmt::Write for Writer {
 
 #[macro_export]
 macro_rules! print {
-    ($($arg:tt)*) => ($crate::writer::_print(format_args!($($arg)*)));
+    ($($arg:tt)*) => {{
+        $crate::writer::_print(format_args!($($arg)*));
+        $crate::serial_print!("{}", format_args!($($arg)*));
+    }};
 }
 
 #[macro_export]

@@ -13,6 +13,7 @@ pub fn init() {
     trace!("VFS initialized");
 }
 
+#[derive(Debug)]
 pub enum VfsError {
     NotFound,
 }
@@ -24,7 +25,14 @@ pub struct Vnode {
 }
 
 pub trait VnodeOps {
-    fn lookup(&self) -> Result<Vnode, VfsError>;
+    fn lookup(&self, path: &str) -> Result<Vnode, VfsError>;
+    fn read(
+        &self,
+        file: &Vnode,
+        buf: &mut [u8],
+        offset: usize,
+        length: usize,
+    ) -> Result<usize, String>;
 }
 
 pub enum VnodeType {

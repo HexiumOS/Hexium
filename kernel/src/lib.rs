@@ -38,25 +38,23 @@ pub fn init() {
     //let mut executor = crate::task::executor::Executor::new();
     //let _ = executor.spawn(crate::task::Task::new(devices::keyboard::trace_keypresses()));
     //executor.run();
-
-    //vfs.unmount_fs();
 }
 
-fn print_startup_message(vfs: &hal::vfs::Vfs) -> [u8; 128] {
-    let mut buffer = [0u8; 128];
-
-    match vfs.lookuppn("/ramdisk/welcome.txt") {
-        Ok(vnode) => {
-            // Use the known buffer size directly instead of calling len()
-            match vnode.ops.read(&vnode, &mut buffer, 0, 128) {
-                Ok(_bytes_read) => {}
-                Err(err) => {
-                    error!("Error reading file: {}", err);
-                }
-            }
-        }
+fn print_startup_message(vfs: &hal::vfs::Vfs) {
+    let file: hal::vfs::Vnode = match vfs.lookuppn("/ramdisk/welcome.txt") {
+        Ok(file) => file,
         Err(err) => {
-            error!("File error: {:?}", err);
+            error!("File lookup error: {:?}", err);
+            return;
+        }
+    };
+
+    let mut buffer = [0u8; 64];
+
+    match file.ops.read(&file, &mut buffer, 0, 64) {
+        Ok(_) => {}
+        Err(err) => {
+            error!("File read error: {:?}", err);
         }
     }
 
@@ -66,8 +64,6 @@ fn print_startup_message(vfs: &hal::vfs::Vfs) -> [u8; 128] {
         unsafe { rtc::read_rtc() }
     );
     info!("{}", String::from_utf8_lossy(&buffer));
-
-    buffer
 }
 
 pub fn hlt_loop() -> ! {

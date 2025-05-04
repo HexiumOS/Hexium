@@ -1,4 +1,4 @@
-use crate::{utils::types::option_to_c_void, boot};
+use crate::{boot, utils::types::option_to_c_void};
 use core::fmt;
 use core::ptr;
 use lazy_static::lazy_static;
@@ -79,14 +79,17 @@ impl Writer {
 impl fmt::Write for Writer {
     fn write_str(&mut self, s: &str) -> fmt::Result {
         self.write_string(s);
-        
+
         Ok(())
     }
 }
 
 #[macro_export]
 macro_rules! print {
-    ($($arg:tt)*) => ($crate::writer::_print(format_args!($($arg)*)));
+    ($($arg:tt)*) => {{
+        $crate::writer::_print(format_args!($($arg)*));
+        $crate::serial_print!("{}", format_args!($($arg)*));
+    }};
 }
 
 #[macro_export]

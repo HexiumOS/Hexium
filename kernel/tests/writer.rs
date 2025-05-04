@@ -2,23 +2,22 @@
 #![no_main]
 #![feature(custom_test_frameworks)]
 #![test_runner(hexium_os::test_runner)]
-#![reexport_test_harness_main="test_main"]
+#![reexport_test_harness_main = "test_main"]
 
 use core::panic::PanicInfo;
 
-use hexium_os::{println, init};
+use hexium_os::{init, println};
 
 #[unsafe(no_mangle)]
 unsafe extern "C" fn kmain() -> ! {
     init(); // Issue#30: Not sure why it's absence causes an loop running of test_println_long test.
-  test_main();
-  loop{}
+    test_main();
+    loop {}
 }
 
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
-  hexium_os::test_panic_handler(info);
-  loop{}
+    hexium_os::test_panic_handler(info);
 }
 
 #[test_case]

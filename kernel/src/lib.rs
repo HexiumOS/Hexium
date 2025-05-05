@@ -136,7 +136,7 @@ unsafe extern "C" fn kmain() -> ! {
 
 #[cfg(test)]
 #[panic_handler]
-// Handles panics during library-specific tests
+/// Handles panics during library-specific tests
 fn panic(info: &PanicInfo) -> ! {
     test_panic_handler(info)
 }

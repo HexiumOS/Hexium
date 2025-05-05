@@ -43,7 +43,7 @@ unsafe extern "C" fn kmain() -> ! {
 
 #[cfg(not(test))]
 #[panic_handler]
-// Handles panics in production with detailed register dump
+/// Handles panics in production, detergates to rsod_handler
 fn panic(info: &PanicInfo) -> ! {
     use hexium_os::utils::registers::{get_registers, print_register_dump};
     panic_log!("{}\n", info);
@@ -53,7 +53,7 @@ fn panic(info: &PanicInfo) -> ! {
 
 #[cfg(test)]
 #[panic_handler]
-// Handles panics during binary tests, delegates to test_panic_handler
+/// Handles panics during binary tests, delegates to test_panic_handler
 fn panic(info: &PanicInfo) -> ! {
     hexium_os::test_panic_handler(info)
 }

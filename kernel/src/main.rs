@@ -15,16 +15,6 @@ fn test_example() {
     assert_eq!(1 + 1, 2);
 }
 
-#[cfg(test)]
-#[unsafe(no_mangle)]
-unsafe extern "C" fn kmain() -> ! {
-    assert!(boot::BASE_REVISION.is_supported());
-    init();
-    test_main();
-    loop {}
-}
-
-#[cfg(not(test))]
 #[unsafe(no_mangle)]
 unsafe extern "C" fn kmain() -> ! {
     assert!(boot::BASE_REVISION.is_supported());
@@ -40,7 +30,15 @@ unsafe extern "C" fn kmain() -> ! {
 
     init();
 
+    #[cfg(test)]
+    {
+        test_main();
+    }
+
+    #[cfg(not(test))]
     hlt_loop();
+    #[cfg(test)]
+    loop {}
 }
 
 #[cfg(not(test))]

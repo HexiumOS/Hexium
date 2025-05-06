@@ -6,7 +6,7 @@
 
 use core::panic::PanicInfo;
 #[cfg(not(test))]
-use hexium_os::{boot, hlt_loop, init, panic_log};
+use hexium_os::{boot, hlt_loop, init};
 #[cfg(test)]
 use hexium_os::{boot, init};
 
@@ -45,10 +45,8 @@ unsafe extern "C" fn kmain() -> ! {
 #[panic_handler]
 /// Handles panics in production, detergates to rsod_handler
 fn panic(info: &PanicInfo) -> ! {
-    use hexium_os::utils::registers::{get_registers, print_register_dump};
-    panic_log!("{}\n", info);
-    print_register_dump(&get_registers());
-    loop {}
+    use hexium_os::rsod::rsod_handler;
+    rsod_handler(info);
 }
 
 #[cfg(test)]

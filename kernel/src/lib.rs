@@ -18,6 +18,7 @@ pub mod hal;
 pub mod interrupts;
 pub mod log;
 pub mod memory;
+pub mod rsod;
 pub mod rtc;
 pub mod serial;
 pub mod task;
@@ -33,6 +34,8 @@ pub fn init() {
     fs::ramfs::init(&vfs);
 
     print_startup_message(&mut vfs);
+
+    panic!("Test panic message");
 
     // Issue#30: Commented out for now as the code doesn't run past this section. Will return it back.
     //let mut executor = crate::task::executor::Executor::new();

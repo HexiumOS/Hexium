@@ -81,7 +81,7 @@ pub fn get_registers() -> Registers {
         // Segment Registers
         asm!(
             "mov {0:x}, cs",
-            "mov {1:x}, ds", 
+            "mov {1:x}, ds",
             "mov {2:x}, es",
             "mov {3:x}, fs",
             "mov {4:x}, gs",
@@ -173,6 +173,73 @@ macro_rules! print_segment_pair {
             $left, $left_val, $right, $right_val
         );
     };
+}
+
+macro_rules! print_pair_with_color {
+    ($left:expr, $left_val:expr, $right:expr, $right_val:expr, $fg_color:expr, $bg_color:expr) => {
+        println!(
+            "\x1b[{};{}m│ {:.<4} 0x{:016x} │ {:.<4} 0x{:016x} │",
+            $fg_color, $bg_color, $left, $left_val, $right, $right_val
+        );
+    };
+}
+
+macro_rules! print_segment_pair_with_color {
+    ($left:expr, $left_val:expr, $right:expr, $right_val:expr, $fg_color:expr, $bg_color:expr) => {
+        println!(
+            "\x1b[{};{}m│ {:<4} 0x{:04x}             │ {:<4} 0x{:04x}             │",
+            $fg_color, $bg_color, $left, $left_val, $right, $right_val
+        );
+    };
+}
+
+pub fn print_register_dump_with_color(regs: &Registers, fg_color: &str, bg_color: &str) {
+    use crate::println;
+    println!("\x1b[{};{}m\nRegister Dump:", fg_color, bg_color);
+    println!(
+        "\x1b[{};{}m┌─────────────────────────┬─────────────────────────┐",
+        fg_color, bg_color
+    );
+
+    // General Purpose Registers
+    print_pair_with_color!("rax", regs.rax, "rbx", regs.rbx, fg_color, bg_color);
+    print_pair_with_color!("rcx", regs.rcx, "rdx", regs.rdx, fg_color, bg_color);
+    print_pair_with_color!("rsi", regs.rsi, "rdi", regs.rdi, fg_color, bg_color);
+    print_pair_with_color!("rbp", regs.rbp, "rsp", regs.rsp, fg_color, bg_color);
+    print_pair_with_color!("r8 ", regs.r8, "r9 ", regs.r9, fg_color, bg_color);
+    print_pair_with_color!("r10", regs.r10, "r11", regs.r11, fg_color, bg_color);
+    print_pair_with_color!("r12", regs.r12, "r13", regs.r13, fg_color, bg_color);
+    print_pair_with_color!("r14", regs.r14, "r15", regs.r15, fg_color, bg_color);
+
+    println!(
+        "\x1b[{};{}m├─────────────────────────┴─────────────────────────┤",
+        fg_color, bg_color
+    );
+
+    // Control Registers
+    println!(
+        "\x1b[{};{}m│ {: <30} 0x{:016x} │",
+        fg_color, bg_color, "rip:", regs.rip
+    );
+    println!(
+        "\x1b[{};{}m│ {: <30} 0x{:016x} │",
+        fg_color, bg_color, "rflags:", regs.rflags
+    );
+
+    println!(
+        "\x1b[{};{}m├─────────────────────────┬─────────────────────────┤",
+        fg_color, bg_color
+    );
+
+    // Segment Registers
+    print_segment_pair_with_color!("cs", regs.cs, "ds", regs.ds, fg_color, bg_color);
+    print_segment_pair_with_color!("es", regs.es, "fs", regs.fs, fg_color, bg_color);
+    print_segment_pair_with_color!("gs", regs.gs, "ss", regs.ss, fg_color, bg_color);
+
+    println!(
+        "\x1b[{};{}m└─────────────────────────┴─────────────────────────┘\x1b[0m",
+        fg_color, bg_color
+    );
 }
 
 pub fn print_register_dump(regs: &Registers) {

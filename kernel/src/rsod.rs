@@ -1,3 +1,4 @@
+use crate::debug::stacktrace::print_stack_trace;
 use crate::print;
 
 macro_rules! panic_log {
@@ -13,6 +14,7 @@ pub fn rsod_handler(info: &core::panic::PanicInfo) -> ! {
     clear_screen_red();
     panic_log!("{}\n", info);
     print_register_dump_with_color(&get_registers(), "37", "41");
+    unsafe { print_stack_trace() };
     loop {}
 }
 

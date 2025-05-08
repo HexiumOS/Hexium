@@ -7,7 +7,7 @@ struct StackFrame {
 }
 
 pub unsafe fn print_stack_trace() {
-    crate::println!("\x1b[37;41mStacktrace:");
+    crate::println!("\n\x1b[37;41mStacktrace:");
 
     let mut frame: *const StackFrame;
 

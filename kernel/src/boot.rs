@@ -1,7 +1,8 @@
 use limine::BaseRevision;
 use limine::modules::InternalModule;
 use limine::request::{
-    FramebufferRequest, HhdmRequest, MemoryMapRequest, RequestsEndMarker, RequestsStartMarker, ModuleRequest,
+    FramebufferRequest, HhdmRequest, MemoryMapRequest, ModuleRequest, RequestsEndMarker,
+    RequestsStartMarker,
 };
 
 #[used]

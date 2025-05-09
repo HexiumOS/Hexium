@@ -3,7 +3,7 @@
 #![feature(abi_x86_interrupt)]
 #![feature(custom_test_frameworks)]
 #![test_runner(crate::test_runner)]
-#![reexport_test_harness_main="test_main"]
+#![reexport_test_harness_main = "test_main"]
 
 extern crate alloc;
 
@@ -11,12 +11,15 @@ use alloc::string::String;
 use core::{arch::asm, panic::PanicInfo};
 
 pub mod boot;
+pub mod debug;
 pub mod devices;
 pub mod drivers;
 pub mod fs;
+pub mod hal;
 pub mod interrupts;
 pub mod log;
 pub mod memory;
+pub mod rsod;
 pub mod rtc;
 pub mod serial;
 pub mod task;
@@ -28,42 +31,41 @@ pub fn init() {
     interrupts::init();
     memory::init();
 
-    let mut vfs = fs::vfs::VFS::new(None);
-    fs::ramfs::init(&mut vfs);
+    let mut vfs = hal::vfs::Vfs::new();
+    fs::ramfs::init(&vfs);
 
     print_startup_message(&mut vfs);
 
     // Issue#30: Commented out for now as the code doesn't run past this section. Will return it back.
-    // let mut executor = crate::task::executor::Executor::new();
-    // let _ = executor.spawn(crate::task::Task::new(devices::keyboard::trace_keypresses()));
-    // executor.run();
-
-    //vfs.unmount_fs();
+    //let mut executor = crate::task::executor::Executor::new();
+    //let _ = executor.spawn(crate::task::Task::new(devices::keyboard::trace_keypresses()));
+    //executor.run();
 }
 
-fn print_startup_message(vfs: &mut fs::vfs::VFS) -> [u8; 128] {
-    let mut buffer = [0u8; 128];
-
-    match vfs.open_file("./welcome.txt") {
-        Ok(vnode) => match vfs.read_file(&vnode, &mut buffer, 0) {
-            Ok(_bytes_read) => {}
-            Err(err) => {
-                error!("Error reading file: {}", err);
-            }
-        },
+fn print_startup_message(vfs: &hal::vfs::Vfs) {
+    let file: hal::vfs::Vnode = match vfs.lookuppn("/ramdisk/welcome.txt") {
+        Ok(file) => file,
         Err(err) => {
-            error!("File not found: {}", err);
+            error!("File lookup error for 'ramdisk/welcome.txt': {:?}", err);
+            return;
+        }
+    };
+
+    let mut buffer = [0u8; 64];
+
+    match file.ops.read(&file, &mut buffer, 0, 64) {
+        Ok(_) => {}
+        Err(err) => {
+            error!("File read error for 'ramdisk/welcome.txt': {:?}", err);
         }
     }
 
     info!(
-        "Hexium OS kernel v{} succesfully initialized at {}",
+        "Hexium OS kernel v{} successfully initialized at {}",
         env!("CARGO_PKG_VERSION"),
         unsafe { rtc::read_rtc() }
     );
     info!("{}", String::from_utf8_lossy(&buffer));
-
-    buffer
 }
 
 pub fn hlt_loop() -> ! {
@@ -83,7 +85,7 @@ pub fn test_panic_handler(info: &PanicInfo) -> ! {
     serial_println!("[failed]");
     serial_println!("Error: {}", info);
     exit_qemu(QemuExitCode::Failed);
-    loop{}
+    loop {}
 }
 
 pub fn test_runner(tests: &[&dyn Testable]) {
@@ -95,7 +97,6 @@ pub fn test_runner(tests: &[&dyn Testable]) {
 
     exit_qemu(QemuExitCode::Success);
 }
-
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u32)]
@@ -118,13 +119,14 @@ pub trait Testable {
 }
 
 impl<T> Testable for T
-where T : Fn(),
+where
+    T: Fn(),
 {
     fn run(&self) {
         serial_print!("{}...\t", core::any::type_name::<T>());
         self();
         serial_println!("[ok]");
-    }   
+    }
 }
 
 #[cfg(test)]
@@ -136,6 +138,7 @@ unsafe extern "C" fn kmain() -> ! {
 
 #[cfg(test)]
 #[panic_handler]
+/// Handles panics during library-specific tests
 fn panic(info: &PanicInfo) -> ! {
     test_panic_handler(info)
 }

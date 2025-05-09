@@ -46,7 +46,7 @@ fn print_startup_message(vfs: &hal::vfs::Vfs) {
     let file: hal::vfs::Vnode = match vfs.lookuppn("/ramdisk/welcome.txt") {
         Ok(file) => file,
         Err(err) => {
-            error!("File lookup error: {:?}", err);
+            error!("File lookup error for 'ramdisk/welcome.txt': {:?}", err);
             return;
         }
     };
@@ -56,7 +56,7 @@ fn print_startup_message(vfs: &hal::vfs::Vfs) {
     match file.ops.read(&file, &mut buffer, 0, 64) {
         Ok(_) => {}
         Err(err) => {
-            error!("File read error: {:?}", err);
+            error!("File read error for 'ramdisk/welcome.txt': {:?}", err);
         }
     }
 

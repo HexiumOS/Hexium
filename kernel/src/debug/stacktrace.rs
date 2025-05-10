@@ -16,40 +16,40 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-use alloc::boxed::Box;
-use core::{
-    future::Future,
-    pin::Pin,
-    sync::atomic::{AtomicU64, Ordering},
-    task::{Context, Poll},
-};
+use crate::print;
 
-pub mod executor;
-
-pub struct Task {
-    id: TaskId,
-    future: Pin<Box<dyn Future<Output = ()>>>,
+#[repr(C)]
+struct StackFrame {
+    prev_frame: *const StackFrame,
+    return_address: usize,
 }
 
-impl Task {
-    pub fn new(future: impl Future<Output = ()> + 'static) -> Task {
-        Task {
-            id: TaskId::new(),
-            future: Box::pin(future),
+pub unsafe fn print_stack_trace() {
+    crate::println!("\n\x1b[37;41mStacktrace:");
+
+    let mut frame: *const StackFrame;
+
+    unsafe {
+        core::arch::asm!(
+            "mov {}, rbp",
+            out(reg) frame,
+            options(nostack, nomem, preserves_flags)
+        );
+    }
+
+    let mut depth = 0;
+
+    while let Some(f) = unsafe { frame.as_ref() } {
+        print!(
+            "Frame {}: return address = 0x{:016X}\n",
+            depth, f.return_address
+        );
+        frame = f.prev_frame;
+        depth += 1;
+
+        if depth > 64 {
+            print!("Stack trace aborted (too deep)\n");
+            break;
         }
-    }
-
-    fn poll(&mut self, context: &mut Context) -> Poll<()> {
-        self.future.as_mut().poll(context)
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-struct TaskId(u64);
-
-impl TaskId {
-    fn new() -> Self {
-        static NEXT_ID: AtomicU64 = AtomicU64::new(0);
-        TaskId(NEXT_ID.fetch_add(1, Ordering::Relaxed))
     }
 }

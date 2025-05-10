@@ -68,4 +68,8 @@ make run
 /tools              # Build & helper scripts/tools
 ```
 
+## :scroll: License
+
+This project is licensed under the GNU General Public License v3.0 - see the [COPYING](COPYING) file for details.
+
 [QEMU]: https://www.qemu.org/

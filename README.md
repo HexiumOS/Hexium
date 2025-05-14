@@ -12,22 +12,23 @@ Welcome to **Hexium OS**, an experimental operating system written in Rust. This
 - :electric_plug: Serial Support
 - :brain: Memory Management
 - :file_cabinet: In-memory File System
-- :dart: Task State Segment (TSS)
+- :dart: Task State Segment
 - :wrench: Heap allocator
 - :keyboard: Keyboard Driver
-- :clock8: Multitasking
+- :clock8: Multitasking (Unavailable)
+- :card_file_box: Virtual Filesystem
 - :x: Shell
 - :x: ACPI/AML Shutdown
 - :x: CpuId Support
 - :x: Mouse Driver
-- :x: Graphical Interface (GUI)
+- :x: Graphical Interface
 - :x: ELF Loader
 - :x: Network Driver
 - :x: Audio Driver
 - :x: FAT32 Support
 - :x: OpenGL-like API
-- :x: Integrated Development Environment (IDE)
 - :x: C/C++ Compiler
+- :x: Rust Standard Library
 - :x: Processes
 - :x: Installation Setup
 - :x: Web Browser
@@ -36,7 +37,9 @@ Welcome to **Hexium OS**, an experimental operating system written in Rust. This
 
 ## **⚙️ Building**
 
-This project requires a nightly version of Rust because it uses some unstable features. You might need to run `rustup update nightly --force` to update to the latest nightly even if some components such as `rustfmt` are missing it.
+This project requires a nightly version of Rust because it uses some unstable features. You might need to run `rustup update nightly --force` to update to the latest nightly even if some components such as `rustfmt` are missing it. Additionally, ensure you have `rustc` and `cargo` version 1.86 or higher installed.
+
+You will also need `xorriso`, a tool for creating ISO images.
 
 You can build the project by running:
 
@@ -58,12 +61,11 @@ make run
 
 ```bash
 /initrd/            # The initial ramdisk
-/userspace/         # Userspace programs
 /kernel/src/        # Kernel source code
 /kernel/target/     # Kernel output directory
 /limine             # Limine and UEFI binaries (generated)
 /ovmf               # Virtual firmware (generated)
-/scripts            # Build & helper scripts
+/tools              # Build & helper scripts/tools
 ```
 
 [QEMU]: https://www.qemu.org/

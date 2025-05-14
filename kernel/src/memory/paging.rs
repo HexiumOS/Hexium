@@ -2,7 +2,7 @@ use crate::{error, hlt_loop, print};
 use x86_64::structures::idt::{InterruptStackFrame, PageFaultErrorCode};
 use x86_64::{
     VirtAddr,
-    structures::paging::{PageTable, OffsetPageTable}
+    structures::paging::{OffsetPageTable, PageTable},
 };
 
 pub fn init() -> OffsetPageTable<'static> {

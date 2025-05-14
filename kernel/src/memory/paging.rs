@@ -1,6 +1,6 @@
 use crate::{error, hlt_loop, print};
-use x86_64::structures::idt::{InterruptStackFrame, PageFaultErrorCode};
-use x86_64::{
+use x86_64c::structures::idt::{InterruptStackFrame, PageFaultErrorCode};
+use x86_64c::{
     VirtAddr,
     structures::paging::{OffsetPageTable, PageTable},
 };
@@ -11,7 +11,7 @@ pub fn init() -> OffsetPageTable<'static> {
 }
 
 pub unsafe fn active_level_4_table(_physical_memory_offset: VirtAddr) -> &'static mut PageTable {
-    use x86_64::registers::control::Cr3;
+    use x86_64c::registers::control::Cr3;
 
     let (level_4_table_frame, _) = Cr3::read();
 
@@ -26,7 +26,7 @@ pub extern "x86-interrupt" fn page_fault_handler(
     stack_frame: InterruptStackFrame,
     error_code: PageFaultErrorCode,
 ) {
-    use x86_64::registers::control::Cr2;
+    use x86_64c::registers::control::Cr2;
 
     error!("EXCEPTION: PAGE FAULT");
     error!("Accessed Address: {:?}", Cr2::read());

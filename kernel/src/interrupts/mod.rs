@@ -31,5 +31,5 @@ pub fn init() {
     gdt::init();
     idt::init();
     unsafe { PICS.lock().initialize() };
-    x86_64::instructions::interrupts::enable();
+    x86_64c::instructions::interrupts::enable();
 }

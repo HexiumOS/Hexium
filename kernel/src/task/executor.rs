@@ -1,7 +1,12 @@
 use crate::error;
 
 use super::{Task, TaskId};
-use alloc::{collections::BTreeMap, string::{String, ToString}, sync::Arc, task::Wake};
+use alloc::{
+    collections::BTreeMap,
+    string::{String, ToString},
+    sync::Arc,
+    task::Wake,
+};
 use core::task::{Context, Poll, Waker};
 use crossbeam_queue::ArrayQueue;
 
@@ -67,7 +72,7 @@ impl Executor {
     }
 
     fn sleep_if_idle(&self) {
-        use x86_64::instructions::interrupts::{self, enable_and_hlt};
+        use x86_64c::instructions::interrupts::{self, enable_and_hlt};
 
         interrupts::disable();
         if self.task_queue.is_empty() {
@@ -93,7 +98,10 @@ impl TaskWaker {
 
     fn wake_task(&self) -> Result<(), ()> {
         if self.task_queue.push(self.task_id).is_err() {
-            error!("Warning: task queue is full, task {:?} could not be woken", self.task_id);
+            error!(
+                "Warning: task queue is full, task {:?} could not be woken",
+                self.task_id
+            );
             return Err(());
         }
         Ok(())

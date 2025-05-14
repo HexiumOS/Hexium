@@ -1,5 +1,5 @@
-use core::fmt;
 use crate::print;
+use core::fmt;
 
 const RTC_ADDRESS_PORT: u16 = 0x70;
 const RTC_DATA_PORT: u16 = 0x71;
@@ -35,8 +35,8 @@ impl fmt::Display for DateTime {
 
 /// Function to read a byte from the RTC
 unsafe fn rtc_read(register: u8) -> u8 {
-    unsafe { x86::io::outb(RTC_ADDRESS_PORT, register) };
-    unsafe { x86::io::inb(RTC_DATA_PORT) }
+    unsafe { x86c::io::outb(RTC_ADDRESS_PORT, register) };
+    unsafe { x86c::io::inb(RTC_DATA_PORT) }
 }
 
 /// Function to convert BCD to binary

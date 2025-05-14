@@ -11,8 +11,8 @@ use futures_util::{
     task::AtomicWaker,
 };
 use pc_keyboard::{DecodedKey, HandleControl, Keyboard, ScancodeSet1, layouts};
-use x86_64::instructions::port::Port;
-use x86_64::structures::idt::InterruptStackFrame;
+use x86_64c::instructions::port::Port;
+use x86_64c::structures::idt::InterruptStackFrame;
 
 static SCANCODE_QUEUE: OnceCell<ArrayQueue<u8>> = OnceCell::uninit();
 static WAKER: AtomicWaker = AtomicWaker::new();

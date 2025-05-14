@@ -1,8 +1,10 @@
 use limine::memory_map::EntryType;
-use x86_64::PhysAddr;
-use x86_64::VirtAddr;
-use x86_64::structures::paging::{FrameAllocator, PhysFrame, Size4KiB, mapper::MapToError,Mapper, Page, PageTableFlags};
 use linked_list_allocator::LockedHeap;
+use x86_64c::PhysAddr;
+use x86_64c::VirtAddr;
+use x86_64c::structures::paging::{
+    FrameAllocator, Mapper, Page, PageTableFlags, PhysFrame, Size4KiB, mapper::MapToError,
+};
 
 pub mod dummy;
 

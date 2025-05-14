@@ -11,6 +11,7 @@ use alloc::string::String;
 use core::{arch::asm, panic::PanicInfo};
 
 pub mod boot;
+pub mod debug;
 pub mod devices;
 pub mod drivers;
 pub mod fs;
@@ -18,6 +19,7 @@ pub mod hal;
 pub mod interrupts;
 pub mod log;
 pub mod memory;
+pub mod rsod;
 pub mod rtc;
 pub mod serial;
 pub mod task;
@@ -44,7 +46,7 @@ fn print_startup_message(vfs: &hal::vfs::Vfs) {
     let file: hal::vfs::Vnode = match vfs.lookuppn("/ramdisk/welcome.txt") {
         Ok(file) => file,
         Err(err) => {
-            error!("File lookup error: {:?}", err);
+            error!("File lookup error for 'ramdisk/welcome.txt': {:?}", err);
             return;
         }
     };
@@ -54,7 +56,7 @@ fn print_startup_message(vfs: &hal::vfs::Vfs) {
     match file.ops.read(&file, &mut buffer, 0, 64) {
         Ok(_) => {}
         Err(err) => {
-            error!("File read error: {:?}", err);
+            error!("File read error for 'ramdisk/welcome.txt': {:?}", err);
         }
     }
 
@@ -136,6 +138,7 @@ unsafe extern "C" fn kmain() -> ! {
 
 #[cfg(test)]
 #[panic_handler]
+/// Handles panics during library-specific tests
 fn panic(info: &PanicInfo) -> ! {
     test_panic_handler(info)
 }

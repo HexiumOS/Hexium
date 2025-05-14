@@ -6,7 +6,7 @@
 
 use core::panic::PanicInfo;
 #[cfg(not(test))]
-use hexium_os::{boot, hlt_loop, init, panic_log};
+use hexium_os::{boot, hlt_loop, init};
 #[cfg(test)]
 use hexium_os::{boot, init};
 
@@ -15,16 +15,6 @@ fn test_example() {
     assert_eq!(1 + 1, 2);
 }
 
-#[cfg(test)]
-#[unsafe(no_mangle)]
-unsafe extern "C" fn kmain() -> ! {
-    assert!(boot::BASE_REVISION.is_supported());
-    init();
-    test_main();
-    loop {}
-}
-
-#[cfg(not(test))]
 #[unsafe(no_mangle)]
 unsafe extern "C" fn kmain() -> ! {
     assert!(boot::BASE_REVISION.is_supported());
@@ -40,20 +30,28 @@ unsafe extern "C" fn kmain() -> ! {
 
     init();
 
+    #[cfg(test)]
+    {
+        test_main();
+    }
+
+    #[cfg(not(test))]
     hlt_loop();
+    #[cfg(test)]
+    loop {}
 }
 
 #[cfg(not(test))]
 #[panic_handler]
+/// Handles panics in production, detergates to rsod_handler
 fn panic(info: &PanicInfo) -> ! {
-    use hexium_os::utils::registers::{get_registers, print_register_dump};
-    panic_log!("{}\n", info);
-    print_register_dump(&get_registers());
-    loop {}
+    use hexium_os::rsod::rsod_handler;
+    rsod_handler(info);
 }
 
 #[cfg(test)]
 #[panic_handler]
+/// Handles panics during binary tests, delegates to test_panic_handler
 fn panic(info: &PanicInfo) -> ! {
     hexium_os::test_panic_handler(info)
 }

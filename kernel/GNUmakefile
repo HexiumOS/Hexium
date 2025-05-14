@@ -25,7 +25,7 @@ endif
 
 .PHONY: all
 all:
-	RUSTFLAGS="-C relocation-model=static" cargo build --target $(RUST_TARGET) --profile $(RUST_PROFILE)
+	RUSTFLAGS="-C relocation-model=static -C force-frame-pointers=yes" cargo build --target $(RUST_TARGET) --profile $(RUST_PROFILE)
 	cp target/$(RUST_TARGET)/$(RUST_PROFILE_SUBDIR)/hexium_os kernel
 
 test:

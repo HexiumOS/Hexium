@@ -1,3 +1,21 @@
+/*
+ * This file is part of Hexium OS.
+ * Copyright (C) 2025 The Hexium OS Authors – see the AUTHORS file.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 use core::arch::asm;
 
 /// Returns the registers of the CPU in a struct
@@ -81,7 +99,7 @@ pub fn get_registers() -> Registers {
         // Segment Registers
         asm!(
             "mov {0:x}, cs",
-            "mov {1:x}, ds", 
+            "mov {1:x}, ds",
             "mov {2:x}, es",
             "mov {3:x}, fs",
             "mov {4:x}, gs",
@@ -173,6 +191,73 @@ macro_rules! print_segment_pair {
             $left, $left_val, $right, $right_val
         );
     };
+}
+
+macro_rules! print_pair_with_color {
+    ($left:expr, $left_val:expr, $right:expr, $right_val:expr, $fg_color:expr, $bg_color:expr) => {
+        println!(
+            "\x1b[{};{}m│ {:.<4} 0x{:016x} │ {:.<4} 0x{:016x} │",
+            $fg_color, $bg_color, $left, $left_val, $right, $right_val
+        );
+    };
+}
+
+macro_rules! print_segment_pair_with_color {
+    ($left:expr, $left_val:expr, $right:expr, $right_val:expr, $fg_color:expr, $bg_color:expr) => {
+        println!(
+            "\x1b[{};{}m│ {:<4} 0x{:04x}             │ {:<4} 0x{:04x}             │",
+            $fg_color, $bg_color, $left, $left_val, $right, $right_val
+        );
+    };
+}
+
+pub fn print_register_dump_with_color(regs: &Registers, fg_color: &str, bg_color: &str) {
+    use crate::println;
+    println!("\x1b[{};{}m\nRegister Dump:", fg_color, bg_color);
+    println!(
+        "\x1b[{};{}m┌─────────────────────────┬─────────────────────────┐",
+        fg_color, bg_color
+    );
+
+    // General Purpose Registers
+    print_pair_with_color!("rax", regs.rax, "rbx", regs.rbx, fg_color, bg_color);
+    print_pair_with_color!("rcx", regs.rcx, "rdx", regs.rdx, fg_color, bg_color);
+    print_pair_with_color!("rsi", regs.rsi, "rdi", regs.rdi, fg_color, bg_color);
+    print_pair_with_color!("rbp", regs.rbp, "rsp", regs.rsp, fg_color, bg_color);
+    print_pair_with_color!("r8 ", regs.r8, "r9 ", regs.r9, fg_color, bg_color);
+    print_pair_with_color!("r10", regs.r10, "r11", regs.r11, fg_color, bg_color);
+    print_pair_with_color!("r12", regs.r12, "r13", regs.r13, fg_color, bg_color);
+    print_pair_with_color!("r14", regs.r14, "r15", regs.r15, fg_color, bg_color);
+
+    println!(
+        "\x1b[{};{}m├─────────────────────────┴─────────────────────────┤",
+        fg_color, bg_color
+    );
+
+    // Control Registers
+    println!(
+        "\x1b[{};{}m│ {: <30} 0x{:016x} │",
+        fg_color, bg_color, "rip:", regs.rip
+    );
+    println!(
+        "\x1b[{};{}m│ {: <30} 0x{:016x} │",
+        fg_color, bg_color, "rflags:", regs.rflags
+    );
+
+    println!(
+        "\x1b[{};{}m├─────────────────────────┬─────────────────────────┤",
+        fg_color, bg_color
+    );
+
+    // Segment Registers
+    print_segment_pair_with_color!("cs", regs.cs, "ds", regs.ds, fg_color, bg_color);
+    print_segment_pair_with_color!("es", regs.es, "fs", regs.fs, fg_color, bg_color);
+    print_segment_pair_with_color!("gs", regs.gs, "ss", regs.ss, fg_color, bg_color);
+
+    println!(
+        "\x1b[{};{}m└─────────────────────────┴─────────────────────────┘\x1b[0m",
+        fg_color, bg_color
+    );
 }
 
 pub fn print_register_dump(regs: &Registers) {

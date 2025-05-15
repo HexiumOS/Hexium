@@ -1,4 +1,4 @@
 #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
 mod x86_shared;
 #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
-use self::x86_shared::*;
+pub use self::x86_shared::*;

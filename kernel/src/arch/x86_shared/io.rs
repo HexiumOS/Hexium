@@ -1,7 +1,7 @@
 use core::arch::asm;
 
 #[inline]
-pub fn outb(port: u16, value: u8) {
+pub unsafe fn outb(port: u16, value: u8) {
     unsafe {
         asm!(
             "out dx, al",
@@ -13,7 +13,7 @@ pub fn outb(port: u16, value: u8) {
 }
 
 #[inline]
-pub fn inb(port: u16) -> u8 {
+pub unsafe fn inb(port: u16) -> u8 {
     let value: u8;
     unsafe {
         asm!(

@@ -35,8 +35,9 @@ impl fmt::Display for DateTime {
 
 /// Function to read a byte from the RTC
 unsafe fn rtc_read(register: u8) -> u8 {
-    unsafe { x86c::io::outb(RTC_ADDRESS_PORT, register) };
-    unsafe { x86c::io::inb(RTC_DATA_PORT) }
+    use crate::arch::io;
+    unsafe { io::outb(RTC_ADDRESS_PORT, register) };
+    unsafe { io::inb(RTC_DATA_PORT) }
 }
 
 /// Function to convert BCD to binary

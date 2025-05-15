@@ -10,6 +10,7 @@ extern crate alloc;
 use alloc::string::String;
 use core::{arch::asm, panic::PanicInfo};
 
+pub mod arch;
 pub mod boot;
 pub mod debug;
 pub mod devices;

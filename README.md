@@ -6,7 +6,7 @@ Welcome to **Hexium OS**, an experimental operating system written in Rust. This
 
 - :rocket: Limine Bootloader
 - :computer: Flanterm terminal
-- :scroll: Global Descriptor Table  
+- :scroll: Global Descriptor Table
 - :zap: Interrupts
 - :page_facing_up: Paging Support
 - :electric_plug: Serial Support
@@ -15,7 +15,7 @@ Welcome to **Hexium OS**, an experimental operating system written in Rust. This
 - :dart: Task State Segment
 - :wrench: Heap allocator
 - :keyboard: Keyboard Driver
-- :clock8: Multitasking (Unavailable)
+- :clock8: Multitasking (Unavailable. see [#30](https://github.com/HexiumOS/Hexium/issues/30))
 - :card_file_box: Virtual Filesystem
 - :x: Shell
 - :x: ACPI/AML Shutdown

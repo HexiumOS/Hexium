@@ -30,6 +30,7 @@ pub fn init() {
     writer::init();
     interrupts::init();
     memory::init();
+    hal::init();
 
     let mut vfs = hal::vfs::Vfs::new();
     fs::ramfs::init(&vfs);

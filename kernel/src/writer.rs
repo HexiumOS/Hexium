@@ -1,3 +1,4 @@
+use crate::trace;
 use crate::{boot, utils::types::option_to_c_void};
 use core::fmt;
 use core::ptr;
@@ -39,6 +40,8 @@ pub fn init() {
             });
         }
     }
+
+    trace!("Writer initialized");
 }
 
 pub struct FlantermContextWrapper(*mut flanterm::sys::flanterm_context);

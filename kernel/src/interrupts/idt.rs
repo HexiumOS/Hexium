@@ -1,6 +1,6 @@
 use super::gdt;
-use crate::debug;
 use crate::interrupts::InterruptIndex;
+use crate::{debug, trace};
 use lazy_static::lazy_static;
 use x86_64c::structures::idt::{InterruptDescriptorTable, InterruptStackFrame};
 
@@ -26,6 +26,7 @@ lazy_static! {
 
 pub fn init() {
     IDT.load();
+    trace!("IDT initialized");
 }
 
 extern "x86-interrupt" fn breakpoint_handler(stack_frame: InterruptStackFrame) {

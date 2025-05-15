@@ -60,7 +60,6 @@ pub fn init(vfs: &Vfs) {
             print!("    Ramdisk address:        {:?}\n", modules[0].addr());
             print!("    Ramdisk size (bytes):   {:?}\n", modules[0].size());
             print!("    Ramdisk module path:    {:?}\n", modules[0].path());
-            print!("\n");
         }
 
         let archive = unsafe {
@@ -69,6 +68,8 @@ pub fn init(vfs: &Vfs) {
         let ramfs = RamFs::new(archive);
         vfs.mount("/ramdisk", Arc::new(ramfs));
     }
+
+    trace!("Ramdisk mounted at /ramdisk");
 }
 
 pub fn tar_lookup<'a>(

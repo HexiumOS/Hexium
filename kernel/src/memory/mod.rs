@@ -25,8 +25,13 @@ pub fn init() {
     // Get a mutable reference to the mapper and initialize heap
     #[allow(static_mut_refs)]
     if let Some(mapper) = unsafe { MEM_MAPPER.as_mut() } {
-        init_heap(mapper, &mut frame_allocator).expect("heap initialization failed");
+        match init_heap(mapper, &mut frame_allocator) {
+            Ok(_) => trace!("Heap initialized"),
+            Err(e) => panic!("heap initialization failed: {:?}", e),
+        }
     }
+
+    trace!("Memory initialized");
 }
 
 pub fn phys_mem_offset() -> VirtAddr {

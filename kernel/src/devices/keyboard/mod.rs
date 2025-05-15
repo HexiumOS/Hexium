@@ -1,5 +1,5 @@
-use crate::interrupts::InterruptIndex;
-use crate::trace;
+use crate::{fatal, hlt_loop, trace};
+use crate::{interrupts::InterruptIndex, warn};
 use conquer_once::spin::OnceCell;
 use core::{
     pin::Pin,
@@ -21,12 +21,12 @@ static WAKER: AtomicWaker = AtomicWaker::new();
 pub(crate) fn add_scancode(scancode: u8) {
     if let Ok(queue) = SCANCODE_QUEUE.try_get() {
         if queue.push(scancode).is_err() {
-            trace!("WARNING: scancode queue full; dropping keyboard input");
+            warn!("Scancode queue full; dropping keyboard input");
         } else {
             WAKER.wake();
         }
     } else {
-        trace!("WARNING: scancode queue uninitialized");
+        warn!("Scancode queue uninitialized");
     }
 }
 
@@ -51,9 +51,12 @@ pub struct ScancodeStream {
 impl ScancodeStream {
     pub fn new() -> Self {
         if !SCANCODE_QUEUE.is_initialized() {
-            SCANCODE_QUEUE
-                .try_init_once(|| ArrayQueue::new(100))
-                .expect("Failed to initialize scancode queue");
+            match SCANCODE_QUEUE.try_init_once(|| ArrayQueue::new(100)) {
+                Ok(_) => {}
+                Err(_) => {
+                    fatal!("Failed to initialize scancode queue");
+                }
+            }
         }
         ScancodeStream { _private: () }
     }

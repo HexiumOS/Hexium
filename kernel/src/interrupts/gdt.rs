@@ -3,6 +3,8 @@ use x86_64c::VirtAddr;
 use x86_64c::structures::gdt::{Descriptor, GlobalDescriptorTable, SegmentSelector};
 use x86_64c::structures::tss::TaskStateSegment;
 
+use crate::trace;
+
 pub const DOUBLE_FAULT_IST_INDEX: u16 = 0;
 
 lazy_static! {
@@ -50,4 +52,6 @@ pub fn init() {
         SS::set_reg(GDT.1.data_selector);
         load_tss(GDT.1.tss_selector);
     }
+
+    trace!("GDT initialized");
 }

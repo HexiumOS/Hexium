@@ -1,5 +1,7 @@
 use x86_64c::instructions::port::Port;
 
+use crate::trace;
+
 const CMD_INIT: u8 = 0x11;
 
 const CMD_END_OF_INTERRUPT: u8 = 0x20;
@@ -86,6 +88,8 @@ impl ChainedPics {
             // Mask everything exept the PIT and Keyboard
             self.write_masks(0xFC, 0xFF);
         }
+
+        trace!("PIC initialized");
     }
 
     pub unsafe fn read_masks(&mut self) -> [u8; 2] {

@@ -1,4 +1,4 @@
-use crate::{fatal, hlt_loop, trace};
+use crate::{fatal, trace};
 use crate::{interrupts::InterruptIndex, warn};
 use conquer_once::spin::OnceCell;
 use core::{

@@ -17,7 +17,6 @@ pub mod devices;
 pub mod drivers;
 pub mod fs;
 pub mod hal;
-pub mod interrupts;
 pub mod log;
 pub mod memory;
 pub mod rsod;
@@ -28,9 +27,6 @@ pub mod utils;
 pub mod writer;
 
 pub fn init() {
-    writer::init();
-    interrupts::init();
-    memory::init();
     hal::init();
 
     let mut vfs = hal::vfs::Vfs::new();

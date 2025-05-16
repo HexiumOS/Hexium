@@ -1,5 +1,5 @@
-use crate::{fatal, trace};
-use crate::{interrupts::InterruptIndex, warn};
+use crate::arch::interrupts::InterruptIndex;
+use crate::{fatal, trace, warn};
 use conquer_once::spin::OnceCell;
 use core::{
     pin::Pin,
@@ -37,7 +37,7 @@ pub extern "x86-interrupt" fn interrupt_handler(_stack_frame: InterruptStackFram
     add_scancode(scancode);
 
     unsafe {
-        crate::interrupts::PICS
+        crate::arch::interrupts::PICS
             .lock()
             .notify_end_of_interrupt(InterruptIndex::Keyboard.as_u8());
     }

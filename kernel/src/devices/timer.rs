@@ -1,4 +1,4 @@
-use crate::interrupts::InterruptIndex;
+use crate::arch::interrupts::InterruptIndex;
 use lazy_static::lazy_static;
 use spin::Mutex;
 use x86_64c::structures::idt::InterruptStackFrame;
@@ -11,7 +11,7 @@ pub extern "x86-interrupt" fn interrupt_handler(_stack_frame: InterruptStackFram
     tick();
 
     unsafe {
-        crate::interrupts::PICS
+        crate::arch::interrupts::PICS
             .lock()
             .notify_end_of_interrupt(InterruptIndex::Timer.as_u8());
     }

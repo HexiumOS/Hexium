@@ -51,6 +51,7 @@ We appreciate code contributions! To contribute code:
 - **Rust conventions**: Follow Rust's official style guide and conventions.
 - **Documentation**: Write clear and concise documentation for your code. Use doc comments (`///`) where appropriate.
 - **Testing**: Ensure your code is well-tested. Write unit tests, integration tests, and any necessary test cases for new features or bug fixes.
+- **Architecture Abstractions**: All architecture abstractions should be accessed only through the hardware abstraction layer (HAL). If this is not possible, you must ensure the code functions correctly on all supported platforms.
 
 ## License
 

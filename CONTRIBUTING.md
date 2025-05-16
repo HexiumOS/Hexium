@@ -54,4 +54,4 @@ We appreciate code contributions! To contribute code:
 
 ## License
 
-By contributing to Hexium OS, you agree that your contributions will be licensed under the [Apache 2.0](LICENSE.txt) license.
+By contributing to Hexium OS, you agree that your contributions will be licensed under the GNU General Public License v3.0 - see the [COPYING](COPYING) file for details.

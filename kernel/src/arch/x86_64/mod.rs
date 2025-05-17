@@ -5,5 +5,5 @@ pub mod registers;
 pub fn init() {
     crate::writer::init();
     interrupts::init();
-    crate::memory::init();
+    memory::init();
 }

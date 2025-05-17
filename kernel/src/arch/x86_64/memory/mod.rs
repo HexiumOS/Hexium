@@ -16,6 +16,8 @@ pub fn init() {
     trace!("Hhdm offset: {:#x}", hhdm_offset());
 }
 
+/* Get functions */
+
 pub fn hhdm_offset() -> VirtAddr {
     unsafe { *HHDM_OFFSET.get_unchecked() }
 }
@@ -25,4 +27,8 @@ pub fn mapper() -> &'static OffsetPageTable<'static> {
     unsafe {
         MAPPER.get_unchecked()
     }
+}
+
+pub fn frame_allocator() -> pmm::CoreFrameAllocator {
+    unsafe { pmm::CoreFrameAllocator::init(crate::boot::MEMMAP_REQUEST.get_response().unwrap()) }
 }

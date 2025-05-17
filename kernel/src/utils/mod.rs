@@ -1,4 +1,3 @@
-pub mod registers;
 pub mod types;
 
 pub fn octal_to_binrary(s: &[u8]) -> i32 {

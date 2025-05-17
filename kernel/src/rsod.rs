@@ -10,7 +10,7 @@ macro_rules! panic_log {
 }
 
 pub fn rsod_handler(info: &core::panic::PanicInfo) -> ! {
-    use crate::utils::registers::{get_registers, print_register_dump_with_color};
+    use crate::arch::registers::{get_registers, print_register_dump_with_color};
     clear_screen_red();
     panic_log!("{}\n", info);
     print_register_dump_with_color(&get_registers(), "37", "41");

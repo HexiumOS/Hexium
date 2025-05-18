@@ -6,8 +6,6 @@ use x86_64c::{
     },
 };
 
-pub mod dummy;
-
 #[global_allocator]
 static ALLOCATOR: LockedHeap = LockedHeap::empty();
 

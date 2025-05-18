@@ -1,5 +1,5 @@
 use crate::trace;
-use crate::{boot, utils::types::option_to_c_void};
+use crate::{hal::boot, utils::types::option_to_c_void};
 use core::fmt;
 use core::ptr;
 use lazy_static::lazy_static;

@@ -11,7 +11,6 @@ use alloc::string::String;
 use core::{arch::asm, panic::PanicInfo};
 
 pub mod arch;
-pub mod boot;
 pub mod devices;
 pub mod drivers;
 pub mod fs;

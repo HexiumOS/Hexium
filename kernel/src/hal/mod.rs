@@ -1,5 +1,6 @@
 use crate::trace;
 
+pub mod boot;
 pub mod clock;
 pub mod vfs;
 

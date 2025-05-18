@@ -1,3 +1,4 @@
+pub mod debug;
 pub mod interrupts;
 pub mod limine;
 pub mod memory;

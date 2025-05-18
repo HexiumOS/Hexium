@@ -12,7 +12,6 @@ use core::{arch::asm, panic::PanicInfo};
 
 pub mod arch;
 pub mod boot;
-pub mod debug;
 pub mod devices;
 pub mod drivers;
 pub mod fs;
@@ -38,6 +37,8 @@ pub fn init() {
     //    let _ = executor.spawn(crate::task::Task::new(devices::keyboard::trace_keypresses()));
     //    executor.run();
     //}
+
+    panic!("Kernel initialization complete");
 }
 
 fn print_startup_message(vfs: &hal::vfs::Vfs) {

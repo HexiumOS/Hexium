@@ -1,4 +1,4 @@
-use crate::debug::stacktrace::print_stack_trace;
+use crate::arch::debug::stacktrace::print_stack_trace;
 use crate::print;
 
 macro_rules! panic_log {

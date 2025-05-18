@@ -11,7 +11,7 @@ static mut MAPPER: Option<OffsetPageTable<'static>> = None;
 static HHDM_OFFSET: Once<VirtAddr> = Once::new();
 
 pub fn init() {
-    if let Some(hhdm_response) = crate::boot::HHDM_REQUEST.get_response() {
+    if let Some(hhdm_response) = crate::arch::limine::HHDM_REQUEST.get_response() {
         HHDM_OFFSET.call_once(|| VirtAddr::new(hhdm_response.offset()));
     }
     trace!("Hhdm offset: {:#x}", hhdm_offset());
@@ -38,5 +38,7 @@ pub fn hhdm_offset() -> VirtAddr {
 }
 
 pub fn frame_allocator() -> pmm::CoreFrameAllocator {
-    unsafe { pmm::CoreFrameAllocator::init(crate::boot::MEMMAP_REQUEST.get_response().unwrap()) }
+    unsafe {
+        pmm::CoreFrameAllocator::init(crate::arch::limine::MEMMAP_REQUEST.get_response().unwrap())
+    }
 }

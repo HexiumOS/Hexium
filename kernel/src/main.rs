@@ -5,10 +5,10 @@
 #![reexport_test_harness_main = "test_main"]
 
 use core::panic::PanicInfo;
-#[cfg(not(test))]
-use hexium_os::{boot, hlt_loop, init};
 #[cfg(test)]
-use hexium_os::{boot, init};
+use hexium_os::init;
+#[cfg(not(test))]
+use hexium_os::{hlt_loop, init};
 
 #[test_case]
 fn test_example() {
@@ -17,8 +17,6 @@ fn test_example() {
 
 #[unsafe(no_mangle)]
 unsafe extern "C" fn kmain() -> ! {
-    assert!(boot::BASE_REVISION.is_supported());
-
     /*
         Issue#30: The lines at the end of this comment below do not seem to have an effect after the init method above
         however calling them above the init method causes a boot-loop.

@@ -20,7 +20,6 @@ pub mod hal;
 pub mod log;
 pub mod rsod;
 pub mod rtc;
-pub mod serial;
 pub mod task;
 pub mod utils;
 pub mod writer;

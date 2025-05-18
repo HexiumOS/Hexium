@@ -12,7 +12,6 @@ use core::{arch::asm, panic::PanicInfo};
 
 pub mod arch;
 pub mod devices;
-pub mod drivers;
 pub mod fs;
 pub mod hal;
 pub mod log;
@@ -58,7 +57,7 @@ fn print_startup_message(vfs: &hal::vfs::Vfs) {
     info!(
         "Hexium OS kernel v{} successfully initialized at {}",
         env!("CARGO_PKG_VERSION"),
-        unsafe { arch::clock::read() }
+        unsafe { arch::clock::read_clock() }
     );
     info!("{}", String::from_utf8_lossy(&buffer));
 }

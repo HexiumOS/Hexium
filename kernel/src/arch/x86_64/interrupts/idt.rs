@@ -17,7 +17,7 @@ lazy_static! {
             .set_handler_fn(super::super::memory::vmm::page_fault_handler);
         //FIXME: Need to unmask the interrupts for it to work
         idt[InterruptIndex::Timer.as_usize()]
-            .set_handler_fn(crate::devices::timer::interrupt_handler);
+            .set_handler_fn(super::super::clock::pit::interrupt_handler);
         idt[InterruptIndex::Keyboard.as_usize()]
             .set_handler_fn(crate::devices::keyboard::interrupt_handler);
         idt

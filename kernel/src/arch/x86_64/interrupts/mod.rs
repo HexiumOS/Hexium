@@ -1,7 +1,8 @@
 pub mod gdt;
 pub mod idt;
+pub mod pic;
 
-use crate::drivers::pic::ChainedPics;
+use pic::ChainedPics;
 use spin;
 
 pub const PIC_1_OFFSET: u8 = 32;

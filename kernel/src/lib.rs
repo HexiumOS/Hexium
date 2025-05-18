@@ -18,7 +18,6 @@ pub mod fs;
 pub mod hal;
 pub mod log;
 pub mod rsod;
-pub mod rtc;
 pub mod task;
 pub mod utils;
 pub mod writer;
@@ -37,8 +36,6 @@ pub fn init() {
     //    let _ = executor.spawn(crate::task::Task::new(devices::keyboard::trace_keypresses()));
     //    executor.run();
     //}
-
-    panic!("Kernel initialization complete");
 }
 
 fn print_startup_message(vfs: &hal::vfs::Vfs) {
@@ -62,7 +59,7 @@ fn print_startup_message(vfs: &hal::vfs::Vfs) {
     info!(
         "Hexium OS kernel v{} successfully initialized at {}",
         env!("CARGO_PKG_VERSION"),
-        unsafe { rtc::read_rtc() }
+        unsafe { arch::clock::read() }
     );
     info!("{}", String::from_utf8_lossy(&buffer));
 }

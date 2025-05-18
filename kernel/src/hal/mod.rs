@@ -1,5 +1,6 @@
 use crate::trace;
 
+pub mod clock;
 pub mod vfs;
 
 pub fn init() {

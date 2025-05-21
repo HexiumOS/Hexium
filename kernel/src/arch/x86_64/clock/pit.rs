@@ -17,11 +17,9 @@
  */
 
 use crate::arch::interrupts::InterruptIndex;
-use crate::interrupts::InterruptIndex;
-use crate::interrupts::InterruptIndex;
 use lazy_static::lazy_static;
 use spin::Mutex;
-use x86_64::structures::idt::InterruptStackFrame;
+use x86_64c::structures::idt::InterruptStackFrame;
 
 lazy_static! {
     pub static ref TICKS: Mutex<usize> = Mutex::new(0);

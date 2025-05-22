@@ -26,7 +26,7 @@
 extern crate alloc;
 
 use alloc::string::String;
-use core::{arch::asm, panic::PanicInfo};
+use core::panic::PanicInfo;
 
 pub mod arch;
 pub mod devices;
@@ -78,19 +78,6 @@ fn print_startup_message(vfs: &hal::vfs::Vfs) {
         unsafe { arch::clock::read_clock() }
     );
     info!("{}", String::from_utf8_lossy(&buffer));
-}
-
-pub fn hlt_loop() -> ! {
-    loop {
-        unsafe {
-            #[cfg(target_arch = "x86_64")]
-            asm!("hlt");
-            #[cfg(any(target_arch = "aarch64", target_arch = "riscv64"))]
-            asm!("wfi");
-            #[cfg(target_arch = "loongarch64")]
-            asm!("idle 0");
-        }
-    }
 }
 
 pub fn test_panic_handler(info: &PanicInfo) -> ! {

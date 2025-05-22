@@ -26,3 +26,9 @@ pub fn init() {
     crate::arch::init();
     trace!("HAL initialized");
 }
+
+pub fn halt_loop() -> ! {
+    loop {
+        crate::arch::instructions::halt();
+    }
+}

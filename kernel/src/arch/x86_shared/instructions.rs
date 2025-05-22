@@ -16,6 +16,32 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-pub mod instructions;
-pub mod io;
-pub mod serial;
+use core::arch::asm;
+
+// Halts the CPU until the next external interrupt
+pub fn halt() {
+    unsafe {
+        asm!("hlt");
+    }
+}
+
+/// Disables interrupts
+pub fn disable_interrupts() {
+    unsafe {
+        asm!("cli");
+    }
+}
+
+/// Enables interrupts
+pub fn enable_interrupts() {
+    unsafe {
+        asm!("sti");
+    }
+}
+
+/// Executes a no-operation instruction
+pub fn no_operation() {
+    unsafe {
+        asm!("nop");
+    }
+}

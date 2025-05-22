@@ -23,10 +23,7 @@
 #![reexport_test_harness_main = "test_main"]
 
 use core::panic::PanicInfo;
-#[cfg(test)]
 use hexium_os::init;
-#[cfg(not(test))]
-use hexium_os::{hlt_loop, init};
 
 #[test_case]
 fn test_example() {
@@ -52,7 +49,7 @@ unsafe extern "C" fn kmain() -> ! {
     }
 
     #[cfg(not(test))]
-    hlt_loop();
+    hexium_os::hal::halt_loop();
     #[cfg(test)]
     loop {}
 }

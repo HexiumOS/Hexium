@@ -16,7 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-use crate::{error, hlt_loop, print};
+use crate::{error, print};
 use x86_64c::structures::{
     idt::{InterruptStackFrame, PageFaultErrorCode},
     paging::OffsetPageTable,
@@ -32,7 +32,7 @@ pub extern "x86-interrupt" fn page_fault_handler(
     error!("Accessed Address: {:?}", Cr2::read());
     error!("Error Code: {:?}", error_code);
     print!("\n{:#?}\n", stack_frame);
-    hlt_loop();
+    crate::hal::halt_loop();
 }
 
 pub fn initialize_offset_table() -> OffsetPageTable<'static> {

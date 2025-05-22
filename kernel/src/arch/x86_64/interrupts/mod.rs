@@ -18,8 +18,9 @@
 
 pub mod gdt;
 pub mod idt;
+pub mod pic;
 
-use crate::drivers::pic::ChainedPics;
+use pic::ChainedPics;
 use spin;
 
 pub const PIC_1_OFFSET: u8 = 32;
@@ -49,5 +50,5 @@ pub fn init() {
     gdt::init();
     idt::init();
     unsafe { PICS.lock().initialize() };
-    x86_64::instructions::interrupts::enable();
+    x86_64c::instructions::interrupts::enable();
 }

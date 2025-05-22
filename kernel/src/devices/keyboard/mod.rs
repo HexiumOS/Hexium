@@ -16,8 +16,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-use crate::interrupts::InterruptIndex;
-use crate::trace;
+use crate::arch::interrupts::InterruptIndex;
+use crate::{fatal, trace, warn};
 use conquer_once::spin::OnceCell;
 use core::{
     pin::Pin,
@@ -29,8 +29,8 @@ use futures_util::{
     task::AtomicWaker,
 };
 use pc_keyboard::{DecodedKey, HandleControl, Keyboard, ScancodeSet1, layouts};
-use x86_64::instructions::port::Port;
-use x86_64::structures::idt::InterruptStackFrame;
+use x86_64c::instructions::port::Port;
+use x86_64c::structures::idt::InterruptStackFrame;
 
 static SCANCODE_QUEUE: OnceCell<ArrayQueue<u8>> = OnceCell::uninit();
 static WAKER: AtomicWaker = AtomicWaker::new();
@@ -39,12 +39,12 @@ static WAKER: AtomicWaker = AtomicWaker::new();
 pub(crate) fn add_scancode(scancode: u8) {
     if let Ok(queue) = SCANCODE_QUEUE.try_get() {
         if queue.push(scancode).is_err() {
-            trace!("WARNING: scancode queue full; dropping keyboard input");
+            warn!("Scancode queue full; dropping keyboard input");
         } else {
             WAKER.wake();
         }
     } else {
-        trace!("WARNING: scancode queue uninitialized");
+        warn!("Scancode queue uninitialized");
     }
 }
 
@@ -55,7 +55,7 @@ pub extern "x86-interrupt" fn interrupt_handler(_stack_frame: InterruptStackFram
     add_scancode(scancode);
 
     unsafe {
-        crate::interrupts::PICS
+        crate::arch::interrupts::PICS
             .lock()
             .notify_end_of_interrupt(InterruptIndex::Keyboard.as_u8());
     }
@@ -69,9 +69,12 @@ pub struct ScancodeStream {
 impl ScancodeStream {
     pub fn new() -> Self {
         if !SCANCODE_QUEUE.is_initialized() {
-            SCANCODE_QUEUE
-                .try_init_once(|| ArrayQueue::new(100))
-                .expect("Failed to initialize scancode queue");
+            match SCANCODE_QUEUE.try_init_once(|| ArrayQueue::new(100)) {
+                Ok(_) => {}
+                Err(_) => {
+                    fatal!("Failed to initialize scancode queue");
+                }
+            }
         }
         ScancodeStream { _private: () }
     }

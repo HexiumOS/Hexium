@@ -31,7 +31,7 @@ lazy_static! {
 #[doc(hidden)]
 pub fn _print(args: ::core::fmt::Arguments) {
     use core::fmt::Write;
-    use x86_64::instructions::interrupts;
+    use x86_64c::instructions::interrupts;
 
     interrupts::without_interrupts(|| {
         SERIAL1
@@ -45,7 +45,7 @@ pub fn _print(args: ::core::fmt::Arguments) {
 #[macro_export]
 macro_rules! serial_print {
     ($($arg:tt)*) => {
-        $crate::serial::_print(format_args!($($arg)*));
+        $crate::arch::serial::_print(format_args!($($arg)*));
     };
 }
 

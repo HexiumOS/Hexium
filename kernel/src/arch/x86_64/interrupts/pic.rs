@@ -16,7 +16,9 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-use x86_64::instructions::port::Port;
+use x86_64c::instructions::port::Port;
+
+use crate::trace;
 
 const CMD_INIT: u8 = 0x11;
 
@@ -104,6 +106,8 @@ impl ChainedPics {
             // Mask everything exept the PIT and Keyboard
             self.write_masks(0xFC, 0xFF);
         }
+
+        trace!("PIC initialized");
     }
 
     pub unsafe fn read_masks(&mut self) -> [u8; 2] {

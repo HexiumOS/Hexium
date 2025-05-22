@@ -16,19 +16,16 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-use crate::trace;
-
-pub mod boot;
 pub mod clock;
-pub mod vfs;
+pub mod debug;
+pub mod interrupts;
+pub mod limine;
+pub mod memory;
+pub mod registers;
 
 pub fn init() {
-    crate::arch::init();
-    trace!("HAL initialized");
-}
-
-pub fn halt_loop() -> ! {
-    loop {
-        crate::arch::instructions::halt();
-    }
+    assert!(limine::BASE_REVISION.is_supported());
+    crate::writer::init();
+    interrupts::init();
+    memory::init();
 }

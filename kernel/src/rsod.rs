@@ -16,7 +16,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-use crate::debug::stacktrace::print_stack_trace;
+use crate::arch::debug::stacktrace::print_stack_trace;
+use crate::arch::registers::{get_registers, print_register_dump_with_color};
 use crate::print;
 
 macro_rules! panic_log {
@@ -28,7 +29,6 @@ macro_rules! panic_log {
 }
 
 pub fn rsod_handler(info: &core::panic::PanicInfo) -> ! {
-    use crate::utils::registers::{get_registers, print_register_dump_with_color};
     clear_screen_red();
     panic_log!("{}\n", info);
     print_register_dump_with_color(&get_registers(), "37", "41");

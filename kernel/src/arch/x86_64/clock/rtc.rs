@@ -16,6 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+use crate::hal::clock::DateTime;
 use crate::print;
 use core::fmt;
 
@@ -28,17 +29,6 @@ const RTC_HOURS: u8 = 0x04;
 const RTC_DAY: u8 = 0x07;
 const RTC_MONTH: u8 = 0x08;
 const RTC_YEAR: u8 = 0x09;
-
-/// Structure to hold the date and time
-#[derive(Debug)]
-pub struct DateTime {
-    second: u8,
-    minute: u8,
-    hour: u8,
-    day: u8,
-    month: u8,
-    year: u8,
-}
 
 /// Implement Display trait for DateTime to format it nicely
 impl fmt::Display for DateTime {
@@ -53,8 +43,9 @@ impl fmt::Display for DateTime {
 
 /// Function to read a byte from the RTC
 unsafe fn rtc_read(register: u8) -> u8 {
-    unsafe { x86::io::outb(RTC_ADDRESS_PORT, register) };
-    unsafe { x86::io::inb(RTC_DATA_PORT) }
+    use crate::arch::io;
+    unsafe { io::outb(RTC_ADDRESS_PORT, register) };
+    unsafe { io::inb(RTC_DATA_PORT) }
 }
 
 /// Function to convert BCD to binary

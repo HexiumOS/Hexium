@@ -16,8 +16,9 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+#[cfg(not(target_arch = "x86_64"))]
+use crate::error;
 use crate::{
-    boot,
     hal::vfs::{Vfs, VfsError, Vnode, VnodeOps, VnodeType},
     print, trace, utils,
 };
@@ -71,21 +72,32 @@ impl VnodeOps for RamFs {
 }
 
 pub fn init(vfs: &Vfs) {
-    if let Some(module_response) = boot::MODULE_REQUEST.get_response() {
-        let modules = module_response.modules();
-        if !modules.is_empty() {
-            trace!("Ramdisk information:");
-            print!("    Ramdisk address:        {:?}\n", modules[0].addr());
-            print!("    Ramdisk size (bytes):   {:?}\n", modules[0].size());
-            print!("    Ramdisk module path:    {:?}\n", modules[0].path());
-            print!("\n");
+    #[cfg(target_arch = "x86_64")]
+    {
+        if let Some(module_response) = crate::arch::limine::MODULE_REQUEST.get_response() {
+            let modules = module_response.modules();
+            if !modules.is_empty() {
+                trace!("Ramdisk information:");
+                print!("    Ramdisk address:        {:?}\n", modules[0].addr());
+                print!("    Ramdisk size (bytes):   {:?}\n", modules[0].size());
+                print!("    Ramdisk module path:    {:?}\n", modules[0].path());
+            }
+
+            let archive = unsafe {
+                core::slice::from_raw_parts(
+                    modules[0].addr() as *const u8,
+                    modules[0].size() as usize,
+                )
+            };
+            let ramfs = RamFs::new(archive);
+            vfs.mount("/ramdisk", Arc::new(ramfs));
         }
 
-        let archive = unsafe {
-            core::slice::from_raw_parts(modules[0].addr() as *const u8, modules[0].size() as usize)
-        };
-        let ramfs = RamFs::new(archive);
-        vfs.mount("/ramdisk", Arc::new(ramfs));
+        trace!("Ramdisk mounted at /ramdisk");
+    }
+    #[cfg(not(target_arch = "x86_64"))]
+    {
+        error!("Ramdisk is not supported on this architecture");
     }
 }
 

@@ -17,9 +17,29 @@
  */
 
 use lazy_static::lazy_static;
-use x86_64::VirtAddr;
-use x86_64::structures::gdt::{Descriptor, GlobalDescriptorTable, SegmentSelector};
-use x86_64::structures::tss::TaskStateSegment;
+use x86_64c::VirtAddr;
+use x86_64c::structures::gdt::{Descriptor, GlobalDescriptorTable, SegmentSelector};
+use x86_64c::structures::tss::TaskStateSegment;
+
+/*
+ * This file is part of Hexium OS.
+ * Copyright (C) 2025 The Hexium OS Authors – see the AUTHORS file.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
+use crate::trace;
 
 pub const DOUBLE_FAULT_IST_INDEX: u16 = 0;
 
@@ -59,8 +79,8 @@ struct Selectors {
 }
 
 pub fn init() {
-    use x86_64::instructions::segmentation::{CS, SS, Segment};
-    use x86_64::instructions::tables::load_tss;
+    use x86_64c::instructions::segmentation::{CS, SS, Segment};
+    use x86_64c::instructions::tables::load_tss;
 
     GDT.0.load();
     unsafe {
@@ -68,4 +88,6 @@ pub fn init() {
         SS::set_reg(GDT.1.data_selector);
         load_tss(GDT.1.tss_selector);
     }
+
+    trace!("GDT initialized");
 }

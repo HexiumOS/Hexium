@@ -16,11 +16,11 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+use super::InterruptIndex;
 use super::gdt;
-use crate::debug;
-use crate::interrupts::InterruptIndex;
+use crate::{debug, trace};
 use lazy_static::lazy_static;
-use x86_64::structures::idt::{InterruptDescriptorTable, InterruptStackFrame};
+use x86_64c::structures::idt::{InterruptDescriptorTable, InterruptStackFrame};
 
 lazy_static! {
     static ref IDT: InterruptDescriptorTable = {
@@ -32,10 +32,10 @@ lazy_static! {
                 .set_stack_index(gdt::DOUBLE_FAULT_IST_INDEX);
         }
         idt.page_fault
-            .set_handler_fn(crate::memory::paging::page_fault_handler);
+            .set_handler_fn(super::super::memory::vmm::page_fault_handler);
         //FIXME: Need to unmask the interrupts for it to work
         idt[InterruptIndex::Timer.as_usize()]
-            .set_handler_fn(crate::devices::timer::interrupt_handler);
+            .set_handler_fn(super::super::clock::pit::interrupt_handler);
         idt[InterruptIndex::Keyboard.as_usize()]
             .set_handler_fn(crate::devices::keyboard::interrupt_handler);
         idt
@@ -44,6 +44,7 @@ lazy_static! {
 
 pub fn init() {
     IDT.load();
+    trace!("IDT initialized");
 }
 
 extern "x86-interrupt" fn breakpoint_handler(stack_frame: InterruptStackFrame) {

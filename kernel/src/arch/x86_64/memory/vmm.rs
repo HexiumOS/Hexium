@@ -16,19 +16,28 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-use crate::trace;
+use crate::{error, print};
+use x86_64c::structures::{
+    idt::{InterruptStackFrame, PageFaultErrorCode},
+    paging::OffsetPageTable,
+};
 
-pub mod boot;
-pub mod clock;
-pub mod vfs;
+pub extern "x86-interrupt" fn page_fault_handler(
+    stack_frame: InterruptStackFrame,
+    error_code: PageFaultErrorCode,
+) {
+    use x86_64c::registers::control::Cr2;
 
-pub fn init() {
-    crate::arch::init();
-    trace!("HAL initialized");
+    error!("EXCEPTION: PAGE FAULT");
+    error!("Accessed Address: {:?}", Cr2::read());
+    error!("Error Code: {:?}", error_code);
+    print!("\n{:#?}\n", stack_frame);
+    crate::hal::halt_loop();
 }
 
-pub fn halt_loop() -> ! {
-    loop {
-        crate::arch::instructions::halt();
+pub fn initialize_offset_table() -> OffsetPageTable<'static> {
+    unsafe {
+        let level_4_table = super::paging::active_level_4_table();
+        OffsetPageTable::new(level_4_table, super::hhdm_offset())
     }
 }

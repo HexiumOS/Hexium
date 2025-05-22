@@ -1,0 +1,16 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug kernel in QEMU",
+            "type": "lldb",
+            "request": "launch",
+            "targetCreateCommands": [
+                "target create ${workspaceFolder}/kernel/kernel",
+            ],
+            "processCreateCommands": [
+                "gdb-remote localhost:1234",
+            ],
+        },
+    ],
+}

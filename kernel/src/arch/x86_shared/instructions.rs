@@ -16,19 +16,32 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-use crate::trace;
+use core::arch::asm;
 
-pub mod boot;
-pub mod clock;
-pub mod vfs;
-
-pub fn init() {
-    crate::arch::init();
-    trace!("HAL initialized");
+// Halts the CPU until the next external interrupt
+pub fn halt() {
+    unsafe {
+        asm!("hlt");
+    }
 }
 
-pub fn halt_loop() -> ! {
-    loop {
-        crate::arch::instructions::halt();
+/// Disables interrupts
+pub fn disable_interrupts() {
+    unsafe {
+        asm!("cli");
+    }
+}
+
+/// Enables interrupts
+pub fn enable_interrupts() {
+    unsafe {
+        asm!("sti");
+    }
+}
+
+/// Executes a no-operation instruction
+pub fn no_operation() {
+    unsafe {
+        asm!("nop");
     }
 }

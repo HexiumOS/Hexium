@@ -16,19 +16,11 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-use crate::trace;
+use crate::hal::clock::DateTime;
 
-pub mod boot;
-pub mod clock;
-pub mod vfs;
+pub mod pit;
+pub mod rtc;
 
-pub fn init() {
-    crate::arch::init();
-    trace!("HAL initialized");
-}
-
-pub fn halt_loop() -> ! {
-    loop {
-        crate::arch::instructions::halt();
-    }
+pub unsafe fn read_clock() -> DateTime {
+    unsafe { rtc::read_rtc() }
 }

@@ -16,7 +16,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-use crate::{boot, utils::types::option_to_c_void};
+use crate::trace;
+use crate::{hal::boot, utils::types::option_to_c_void};
 use core::fmt;
 use core::ptr;
 use lazy_static::lazy_static;
@@ -57,6 +58,8 @@ pub fn init() {
             });
         }
     }
+
+    trace!("Writer initialized");
 }
 
 pub struct FlantermContextWrapper(*mut flanterm::sys::flanterm_context);
@@ -119,7 +122,7 @@ macro_rules! println {
 #[doc(hidden)]
 pub fn _print(args: fmt::Arguments) {
     use core::fmt::Write;
-    use x86_64::instructions::interrupts;
+    use x86_64c::instructions::interrupts;
 
     interrupts::without_interrupts(|| {
         WRITER.lock().write_fmt(args).unwrap();

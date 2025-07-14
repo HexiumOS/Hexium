@@ -1,14 +1,9 @@
 #![no_std]
 #![no_main]
 
-use hexium::serial_println;
-
 #[unsafe(no_mangle)]
 unsafe extern "C" fn kmain() -> ! {
-    assert!(hexium::bootloader::BASE_REVISION.is_supported());
-
-    serial_println!("Hey!");
-
+    hexium::arch::init();
     halt_device();
 }
 

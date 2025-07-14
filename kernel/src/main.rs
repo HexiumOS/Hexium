@@ -1,75 +1,43 @@
-/*
- * This file is part of Hexium OS.
- * Copyright (C) 2025 The Hexium OS Authors – see the AUTHORS file.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <https://www.gnu.org/licenses/>.
- */
-
 #![no_std]
 #![no_main]
-#![feature(custom_test_frameworks)]
-#![test_runner(hexium_os::test_runner)]
-#![reexport_test_harness_main = "test_main"]
 
-use core::panic::PanicInfo;
-#[cfg(not(test))]
-use hexium_os::{boot, hlt_loop, init};
-#[cfg(test)]
-use hexium_os::{boot, init};
+use core::arch::asm;
 
-#[test_case]
-fn test_example() {
-    assert_eq!(1 + 1, 2);
-}
+pub mod bootloader;
 
 #[unsafe(no_mangle)]
 unsafe extern "C" fn kmain() -> ! {
-    assert!(boot::BASE_REVISION.is_supported());
+    assert!(bootloader::BASE_REVISION.is_supported());
 
-    /*
-        Issue#30: The lines at the end of this comment below do not seem to have an effect after the init method above
-        however calling them above the init method causes a boot-loop.
-        NOTE: Calling them after the init method after the executor code has been commented back in,
-        will cause them not to be run as the executor code seems to block the 'thread'.
-        print!("Test");
-        println!("Test2");
-    */
+    if let Some(framebuffer_response) = bootloader::FRAMEBUFFER_REQUEST.get_response() {
+        if let Some(framebuffer) = framebuffer_response.framebuffers().next() {
+            for i in 0..100_u64 {
+                let pixel_offset = i * framebuffer.pitch() + i * 4;
 
-    init();
-
-    #[cfg(test)]
-    {
-        test_main();
+                unsafe {
+                    framebuffer
+                        .addr()
+                        .add(pixel_offset as usize)
+                        .cast::<u32>()
+                        .write(0xFFFFFFFF)
+                }
+            }
+        }
     }
 
-    #[cfg(not(test))]
-    hlt_loop();
-    #[cfg(test)]
-    loop {}
+    halt_device();
 }
 
-#[cfg(not(test))]
 #[panic_handler]
-/// Handles panics in production, detergates to rsod_handler
-fn panic(info: &PanicInfo) -> ! {
-    use hexium_os::rsod::rsod_handler;
-    rsod_handler(info);
+fn panic(_info: &core::panic::PanicInfo) -> ! {
+    halt_device();
 }
 
-#[cfg(test)]
-#[panic_handler]
-/// Handles panics during binary tests, delegates to test_panic_handler
-fn panic(info: &PanicInfo) -> ! {
-    hexium_os::test_panic_handler(info)
+fn halt_device() -> ! {
+    loop {
+        unsafe {
+            #[cfg(target_arch = "x86_64")]
+            asm!("hlt");
+        }
+    }
 }

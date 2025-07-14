@@ -1,17 +1,13 @@
-MAKEFLAGS += -rR
-.SUFFIXES:
+include ../tools/utils.mk
 
 override OUTPUT := kernel
 
-override USER_VARIABLE = $(if $(filter $(origin $(1)),default undefined),$(eval override $(1) := $(2)))
+$(call USER_VARIABLE, KARCH, x86_64)
 
-$(call USER_VARIABLE,KARCH,x86_64)
+.PHONY: all clean distclean
 
 ifeq ($(RUST_TARGET),)
     override RUST_TARGET := $(KARCH)-unknown-none
-	ifeq ($(KARCH),riscv64)
-    	override RUST_TARGET := riscv64gc-unknown-none-elf
-	endif
 endif
 
 ifeq ($(RUST_PROFILE),)
@@ -23,31 +19,18 @@ ifeq ($(RUST_PROFILE),dev)
     override RUST_PROFILE_SUBDIR := debug
 endif
 
-.PHONY: all
 all:
-	RUSTFLAGS="-C relocation-model=static -C force-frame-pointers=yes" cargo build --target $(RUST_TARGET) --profile $(RUST_PROFILE)
-	cp target/$(RUST_TARGET)/$(RUST_PROFILE_SUBDIR)/hexium_os kernel
+	RUSTFLAGS="-C relocation-model=static" cargo build --target $(RUST_TARGET) --profile $(RUST_PROFILE)
+	cp target/$(RUST_TARGET)/$(RUST_PROFILE_SUBDIR)/$$(cd target/$(RUST_TARGET)/$(RUST_PROFILE_SUBDIR) && find -maxdepth 1 -perm -111 -type f) kernel
 
-test:
-	mkdir -p kernel-test
-	RUSTFLAGS="-C relocation-model=static" cargo test --no-run --target $(RUST_TARGET) --profile $(RUST_PROFILE) --color always \
-		2>&1 | tee .test-log.txt
-	@grep -o 'target/[^ )]*' .test-log.txt | while read -r path; do \
-		if [ -x "$$path" ]; then \
-			echo "Copying $$path to kernel-test/"; \
-			cp "$$path" kernel-test/; \
-		else \
-			echo "Skipping non-executable: $$path"; \
-		fi \
-	done
-
-	@rm .test-log.txt
-
-.PHONY: clean
+#
+# Clean intermediate and build files
+#
 clean:
 	cargo clean
-	rm -rf kernel
-	rm -rf kernel-test
+	rm -f kernel
 
-.PHONY: distclean
-distclean: clean
+#
+# Clean other files
+#
+disclean: clean

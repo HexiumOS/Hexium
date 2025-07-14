@@ -1,7 +1,3 @@
-/limine
-/log
 /ovmf
 *.iso
-*.img
 *.hdd
-/hexium_os-tests

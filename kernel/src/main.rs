@@ -1,29 +1,13 @@
 #![no_std]
 #![no_main]
 
-use core::arch::asm;
-
-pub mod bootloader;
+use hexium::serial_println;
 
 #[unsafe(no_mangle)]
 unsafe extern "C" fn kmain() -> ! {
-    assert!(bootloader::BASE_REVISION.is_supported());
+    assert!(hexium::bootloader::BASE_REVISION.is_supported());
 
-    if let Some(framebuffer_response) = bootloader::FRAMEBUFFER_REQUEST.get_response() {
-        if let Some(framebuffer) = framebuffer_response.framebuffers().next() {
-            for i in 0..100_u64 {
-                let pixel_offset = i * framebuffer.pitch() + i * 4;
-
-                unsafe {
-                    framebuffer
-                        .addr()
-                        .add(pixel_offset as usize)
-                        .cast::<u32>()
-                        .write(0xFFFFFFFF)
-                }
-            }
-        }
-    }
+    serial_println!("Hey!");
 
     halt_device();
 }
@@ -34,10 +18,8 @@ fn panic(_info: &core::panic::PanicInfo) -> ! {
 }
 
 fn halt_device() -> ! {
+    hexium::arch::interrupts::disable();
     loop {
-        unsafe {
-            #[cfg(target_arch = "x86_64")]
-            asm!("hlt");
-        }
+        hexium::arch::interrupts::wait();
     }
 }

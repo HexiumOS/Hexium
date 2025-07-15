@@ -47,7 +47,7 @@ pub fn init() {
         }
     }
 
-    crate::println!("Initialized Flanterm");
+    crate::trace!("Initialized Flanterm");
 }
 
 pub struct FlantermContextWrapper(*mut flanterm::sys::flanterm_context);

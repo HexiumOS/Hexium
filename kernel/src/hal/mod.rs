@@ -1,6 +1,7 @@
+pub mod log;
 pub mod print;
 
 pub fn init() {
     crate::arch::init();
-    crate::println!("Initialized HexiumOS");
+    crate::info!("Initialized HAL");
 }

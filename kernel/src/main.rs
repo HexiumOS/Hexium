@@ -3,7 +3,7 @@
 
 #[unsafe(no_mangle)]
 unsafe extern "C" fn kmain() -> ! {
-    hexium::arch::init();
+    hexium::hal::init();
     halt_device();
 }
 

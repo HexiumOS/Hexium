@@ -1,5 +1,4 @@
 pub mod boot;
-pub mod gdt;
 pub mod writer;
 
 pub fn init() {

@@ -1,5 +1,6 @@
 pub mod boot;
 pub mod gdt;
+pub mod idt;
 pub mod tss;
 pub mod writer;
 
@@ -8,4 +9,5 @@ pub fn init() {
     writer::init();
     gdt::init();
     tss::init();
+    idt::init();
 }

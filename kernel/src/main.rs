@@ -3,7 +3,6 @@
 
 #[unsafe(no_mangle)]
 unsafe extern "C" fn kmain() -> ! {
-    hexium::hal::init();
     halt_device();
 }
 
@@ -13,8 +12,12 @@ fn panic(_info: &core::panic::PanicInfo) -> ! {
 }
 
 fn halt_device() -> ! {
-    hexium::arch::interrupts::disable();
+    unsafe {
+        core::arch::asm!("cli");
+    }
     loop {
-        hexium::arch::interrupts::wait();
+        unsafe {
+            core::arch::asm!("hlt");
+        }
     }
 }

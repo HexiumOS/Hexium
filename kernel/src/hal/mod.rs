@@ -1,3 +1,5 @@
+pub mod print;
+
 pub fn init() {
     crate::arch::init();
 }

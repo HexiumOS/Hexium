@@ -1,4 +1,5 @@
 use crate::arch::x86_shared as x86;
+use core::fmt::Write;
 
 const SERIAL_PORT1: u16 = 0x3F8; // Also known as COM1
 
@@ -56,6 +57,10 @@ fn line_status() -> LineStatusFlags {
     LineStatusFlags::from_bits_truncate(x86::io::inb(line_status_port()))
 }
 
+pub fn _print(args: ::core::fmt::Arguments) {
+    let _ = crate::arch::interrupts::without_interrupts(|| UartWriter.write_fmt(args));
+}
+
 bitflags::bitflags! {
     #[repr(transparent)]
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -68,6 +73,17 @@ bitflags::bitflags! {
 #[non_exhaustive]
 #[derive(Clone, PartialEq, Eq, Debug)]
 pub struct WouldBlockError;
+
+struct UartWriter;
+
+impl Write for UartWriter {
+    fn write_str(&mut self, s: &str) -> core::fmt::Result {
+        for byte in s.bytes() {
+            send(byte);
+        }
+        Ok(())
+    }
+}
 
 fn base_port() -> u16 {
     SERIAL_PORT1

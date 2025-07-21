@@ -41,6 +41,8 @@ pub fn init() {
             });
         }
     }
+
+    crate::trace!("Initialized Flanterm context");
 }
 
 lazy_static::lazy_static! {

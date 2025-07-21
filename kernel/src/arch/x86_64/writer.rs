@@ -46,12 +46,12 @@ pub fn init() {
 lazy_static::lazy_static! {
     pub static ref FLANTERM_CTX: Mutex<FlantermContext> =
         Mutex::new(FlantermContext(ptr::null_mut()));
-    pub static ref WRITER: Mutex<Writer> = Mutex::new(Writer {});
+    pub static ref WRITER: Mutex<FlantermWriter> = Mutex::new(FlantermWriter {});
 }
 
-pub struct Writer {}
+pub struct FlantermWriter {}
 
-impl Writer {
+impl FlantermWriter {
     fn write_string(&mut self, s: &str) {
         unsafe {
             flanterm::sys::flanterm_write(FLANTERM_CTX.lock().0, s.as_ptr() as *const i8, s.len())
@@ -59,7 +59,7 @@ impl Writer {
     }
 }
 
-impl fmt::Write for Writer {
+impl fmt::Write for FlantermWriter {
     fn write_str(&mut self, s: &str) -> fmt::Result {
         self.write_string(s);
         Ok(())

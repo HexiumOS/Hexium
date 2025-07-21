@@ -1,3 +1,4 @@
+pub mod log;
 pub mod print;
 
 pub fn init() {

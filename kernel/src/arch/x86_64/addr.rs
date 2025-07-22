@@ -1,4 +1,5 @@
 #[repr(transparent)]
+#[derive(Clone, Copy)]
 pub struct VirtAddr(u64);
 
 impl VirtAddr {
@@ -23,6 +24,11 @@ impl VirtAddr {
     #[inline]
     pub const fn new_truncate(addr: u64) -> VirtAddr {
         VirtAddr(((addr << 16) as i64 >> 16) as u64)
+    }
+
+    #[inline]
+    pub const fn as_u64(self) -> u64 {
+        self.0
     }
 }
 

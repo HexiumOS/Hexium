@@ -12,6 +12,7 @@ pub fn init() {
         SS::set_reg(GDT.1.data_selector);
     }
 
+    #[cfg(debug_assertions)]
     GDT.0.verify();
 
     trace!("Initialized GDT");
@@ -117,7 +118,7 @@ impl<const MAX: usize> GlobalDescriptorTable<MAX> {
 
     #[inline]
     pub fn load(&'static self) {
-        trace!("Loading GDT...");
+        debug!("Loading GDT...");
         unsafe { self.unsafe_load() };
     }
 
@@ -128,8 +129,9 @@ impl<const MAX: usize> GlobalDescriptorTable<MAX> {
         }
     }
 
+    #[cfg(debug_assertions)]
     pub fn verify(&self) {
-        trace!("Verifying GDT load...");
+        debug!("Verifying GDT load...");
         let gdtr = read_gdtr();
         let expected = GDT.0.pointer();
 
@@ -175,7 +177,7 @@ impl<const MAX: usize> GlobalDescriptorTable<MAX> {
             "SS does not match GDT data selector"
         );
 
-        trace!("GDT successfully verified.");
+        debug!("GDT successfully verified.");
     }
 }
 

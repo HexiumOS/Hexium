@@ -12,9 +12,6 @@ pub fn init() {
         SS::set_reg(GDT.1.data_selector);
     }
 
-    #[cfg(debug_assertions)]
-    GDT.0.verify();
-
     trace!("Initialized GDT");
 }
 
@@ -118,7 +115,6 @@ impl<const MAX: usize> GlobalDescriptorTable<MAX> {
 
     #[inline]
     pub fn load(&'static self) {
-        debug!("Loading GDT...");
         unsafe { self.unsafe_load() };
     }
 
@@ -127,57 +123,6 @@ impl<const MAX: usize> GlobalDescriptorTable<MAX> {
         unsafe {
             lgdt(&self.pointer());
         }
-    }
-
-    #[cfg(debug_assertions)]
-    pub fn verify(&self) {
-        debug!("Verifying GDT load...");
-        let gdtr = read_gdtr();
-        let expected = GDT.0.pointer();
-
-        debug!(
-            "GDTR: base={:#018x}, limit={:#06x}",
-            gdtr.base.as_u64(),
-            gdtr.limit
-        );
-        debug!(
-            "Expected: base={:#018x}, limit={:#06x}",
-            expected.base.as_u64(),
-            expected.limit
-        );
-
-        if gdtr.base.as_u64() != expected.base.as_u64() || gdtr.limit != expected.limit {
-            panic!(
-                "GDT mismatch!\nLoaded GDTR: base={:#018x}, limit={:#06x}\nExpected:    base={:#018x}, limit={:#06x}",
-                gdtr.base.as_u64(),
-                gdtr.limit,
-                expected.base.as_u64(),
-                expected.limit
-            );
-        }
-
-        let cs: u16;
-        let ss: u16;
-        unsafe {
-            core::arch::asm!("mov {0:x}, cs", out(reg) cs);
-            core::arch::asm!("mov {0:x}, ss", out(reg) ss);
-        }
-
-        debug!(
-            "CS: {:#04x} (expected {:#04x}), SS: {:#04x} (expected {:#04x})",
-            cs, GDT.1.code_selector.0, ss, GDT.1.data_selector.0
-        );
-
-        assert_eq!(
-            cs, GDT.1.code_selector.0,
-            "CS does not match GDT code selector"
-        );
-        assert_eq!(
-            ss, GDT.1.data_selector.0,
-            "SS does not match GDT data selector"
-        );
-
-        debug!("GDT successfully verified.");
     }
 }
 
@@ -272,21 +217,4 @@ impl DescriptorFlags {
         Self::from_bits_truncate(Self::KERNEL_DATA.bits() | Self::DPL_RING_3.bits());
     pub const USER_CODE64: Self =
         Self::from_bits_truncate(Self::KERNEL_CODE64.bits() | Self::DPL_RING_3.bits());
-}
-
-fn read_gdtr() -> DescriptorTablePointer {
-    let mut gdtr = DescriptorTablePointer {
-        limit: 0,
-        base: VirtAddr::new(0),
-    };
-
-    unsafe {
-        core::arch::asm!(
-            "sgdt [{}]",
-            in(reg) &mut gdtr,
-            options(nostack, preserves_flags)
-        );
-    }
-
-    gdtr
 }

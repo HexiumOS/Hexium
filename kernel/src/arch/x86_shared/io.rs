@@ -1,5 +1,7 @@
 use core::arch::asm;
 
+const UNUSED_PORT: u16 = 0x80;
+
 #[inline]
 pub fn outb(port: u16, value: u8) {
     unsafe {
@@ -24,4 +26,9 @@ pub fn inb(port: u16) -> u8 {
         );
     }
     value
+}
+
+#[inline]
+pub fn iowait() {
+    outb(UNUSED_PORT, 0);
 }

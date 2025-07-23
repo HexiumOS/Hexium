@@ -3,7 +3,7 @@ pub trait Segment {
     unsafe fn set_reg(sel: SegmentSelector);
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 #[repr(transparent)]
 pub struct SegmentSelector(pub u16);
 

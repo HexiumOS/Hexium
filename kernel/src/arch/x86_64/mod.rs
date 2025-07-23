@@ -2,6 +2,7 @@ pub mod addr;
 pub mod boot;
 pub mod drivers;
 pub mod gdt;
+pub mod idt;
 pub mod instructions;
 pub mod interrupts;
 pub mod registers;
@@ -15,6 +16,7 @@ pub fn init() {
     writer::init();
     gdt::init();
     tss::init();
+    idt::init();
 }
 
 #[repr(u8)]

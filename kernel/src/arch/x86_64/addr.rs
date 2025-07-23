@@ -1,7 +1,7 @@
 use core::ops::Add;
 
 #[repr(transparent)]
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct VirtAddr(u64);
 
 impl VirtAddr {

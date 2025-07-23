@@ -2,7 +2,6 @@ use crate::arch::DescriptorTablePointer;
 use crate::arch::addr::VirtAddr;
 use crate::arch::registers::segmentation::{CS, SS, SegmentSelector};
 use crate::arch::x86_64::registers::segmentation::Segment;
-use crate::debug;
 use crate::{arch::PrivilegeLevel, trace};
 
 pub fn init() {

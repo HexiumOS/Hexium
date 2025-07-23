@@ -1,6 +1,9 @@
+use bit_field::BitField;
+
 use crate::arch::DescriptorTablePointer;
 use crate::arch::addr::VirtAddr;
 use crate::arch::registers::segmentation::{CS, SS, SegmentSelector};
+use crate::arch::tss::TaskStateSegment;
 use crate::arch::x86_64::registers::segmentation::Segment;
 use crate::{arch::PrivilegeLevel, trace};
 
@@ -15,20 +18,23 @@ pub fn init() {
 }
 
 lazy_static::lazy_static! {
-    static ref GDT: (GlobalDescriptorTable, Selectors) = {
+    pub static ref GDT: (GlobalDescriptorTable, Selectors) = {
         let mut gdt = GlobalDescriptorTable::new();
         let code_selector = gdt.append(Descriptor::kernel_code_segment());
         let data_selector = gdt.append(Descriptor::kernel_data_segment());
+        let tss_selector = gdt.append(Descriptor::tss_segment(&super::tss::TSS));
         (gdt, Selectors {
             code_selector,
             data_selector,
+            tss_selector,
         })
     };
 }
 
-struct Selectors {
+pub struct Selectors {
     code_selector: SegmentSelector,
     data_selector: SegmentSelector,
+    pub tss_selector: SegmentSelector,
 }
 
 // A GDT Entry is 8 bytes so it can be represented using a transparent u64
@@ -166,6 +172,34 @@ impl Descriptor {
     #[inline]
     pub const fn user_code_segment() -> Descriptor {
         Descriptor::UserSegment(DescriptorFlags::USER_CODE64.bits())
+    }
+
+    #[inline]
+    pub fn tss_segment(tss: &'static TaskStateSegment) -> Descriptor {
+        // SAFETY: The pointer is derived from a &'static reference, which ensures its validity.
+        unsafe { Self::tss_segment_unchecked(tss) }
+    }
+
+    #[inline]
+    pub unsafe fn tss_segment_unchecked(tss: *const TaskStateSegment) -> Descriptor {
+        use self::DescriptorFlags as Flags;
+        use core::mem::size_of;
+
+        let ptr = tss as u64;
+
+        let mut low = Flags::PRESENT.bits();
+        // base
+        low.set_bits(16..40, ptr.get_bits(0..24));
+        low.set_bits(56..64, ptr.get_bits(24..32));
+        // limit (the `-1` in needed since the bound is inclusive)
+        low.set_bits(0..16, (size_of::<TaskStateSegment>() - 1) as u64);
+        // type (0b1001 = available 64-bit tss)
+        low.set_bits(40..44, 0b1001);
+
+        let mut high = 0;
+        high.set_bits(0..32, ptr.get_bits(32..64));
+
+        Descriptor::SystemSegment(low, high)
     }
 }
 

@@ -1,3 +1,5 @@
+use core::ops::Add;
+
 #[repr(transparent)]
 #[derive(Clone, Copy)]
 pub struct VirtAddr(u64);
@@ -30,6 +32,31 @@ impl VirtAddr {
     pub const fn as_u64(self) -> u64 {
         self.0
     }
+
+    #[inline]
+    pub const fn zero() -> VirtAddr {
+        VirtAddr(0)
+    }
+
+    #[inline]
+    pub fn from_ptr<T: ?Sized>(ptr: *const T) -> Self {
+        Self::new(ptr as *const () as u64)
+    }
 }
 
+impl Add<u64> for VirtAddr {
+    type Output = Self;
+
+    #[inline]
+    fn add(self, rhs: u64) -> Self::Output {
+        VirtAddr::try_new(
+            self.0
+                .checked_add(rhs)
+                .expect("attempt to add with overflow"),
+        )
+        .expect("attempt to add resulted in non-canonical virtual address")
+    }
+}
+
+#[derive(Debug)]
 pub struct VirtAddrNotValid(pub u64);

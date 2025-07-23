@@ -5,6 +5,7 @@ pub mod gdt;
 pub mod instructions;
 pub mod interrupts;
 pub mod registers;
+pub mod tss;
 pub mod writer;
 
 pub fn init() {
@@ -13,6 +14,7 @@ pub fn init() {
     drivers::uart_16650::init();
     writer::init();
     gdt::init();
+    tss::init();
 }
 
 #[repr(u8)]

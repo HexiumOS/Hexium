@@ -10,6 +10,7 @@ pub mod tss;
 pub mod writer;
 
 pub fn init() {
+    interrupts::disable();
     assert!(boot::BASE_REVISION.is_supported());
 
     drivers::uart_16650::init();
@@ -17,6 +18,8 @@ pub fn init() {
     gdt::init();
     tss::init();
     idt::init();
+    drivers::pic8259::init();
+    interrupts::enable();
 }
 
 #[repr(u8)]

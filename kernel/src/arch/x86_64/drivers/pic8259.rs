@@ -28,16 +28,6 @@ pub enum InterruptIndex {
     Timer = PIC_1_OFFSET,
 }
 
-impl InterruptIndex {
-    pub fn as_u8(self) -> u8 {
-        self as u8
-    }
-
-    pub fn as_usize(self) -> usize {
-        usize::from(self.as_u8())
-    }
-}
-
 struct Pic {
     offset: u8,
     command: u16,
@@ -133,7 +123,7 @@ impl ChainedPics {
         iowait();
     }
 
-    pub fn send_eoi(&self, irq: u8) {
+    pub fn send_eoi(&self, irq: u32) {
         if irq >= 8 {
             outb(self.pics[1].command, CMD_END_OF_INTERRUPT);
         }

@@ -4,6 +4,7 @@ use crate::{
     arch::{
         DescriptorTablePointer,
         addr::VirtAddr,
+        drivers::{pic8259::InterruptIndex, pit},
         registers::{
             rflags::RFlags,
             segmentation::{CS, Segment, SegmentSelector},
@@ -22,6 +23,7 @@ lazy_static::lazy_static! {
     static ref IDT: InterruptDescriptorTable = {
         let mut idt = InterruptDescriptorTable::new();
         idt.breakpoint.set_handler_fn(breakpoint_handler);
+        idt.interrupts[InterruptIndex::Timer as usize].set_handler_fn(pit::interrupt_handler);
         idt
     };
 }

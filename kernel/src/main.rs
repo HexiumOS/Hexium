@@ -1,7 +1,7 @@
 #![no_std]
 #![no_main]
 
-use hexium::{debug, panic_log};
+use hexium::panic_log;
 
 #[unsafe(no_mangle)]
 unsafe extern "C" fn kmain() -> ! {

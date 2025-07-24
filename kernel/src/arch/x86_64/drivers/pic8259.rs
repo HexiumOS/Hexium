@@ -1,6 +1,6 @@
 use crate::{
     arch::io::{inb, iowait, outb},
-    trace,
+    debug, trace,
 };
 use spin::Mutex;
 
@@ -111,6 +111,8 @@ impl ChainedPics {
 
         let mask = inb(port);
         outb(port, mask | (1 << irq));
+
+        debug!("Masked PIC IRQ: {}", irq);
     }
 
     pub fn unmask(&self, mut irq: u16) {
@@ -124,6 +126,8 @@ impl ChainedPics {
 
         let mask = inb(port);
         outb(port, mask & !(1 << irq));
+
+        debug!("Unmasked PIC IRQ: {}", irq);
     }
 
     pub fn disable(&self) {
@@ -131,6 +135,8 @@ impl ChainedPics {
         iowait();
         outb(self.pics[1].data, u8::MAX);
         iowait();
+
+        trace!("Disabled Legacy PIC");
     }
 
     pub fn send_eoi(&self, irq: u8) {
@@ -138,5 +144,7 @@ impl ChainedPics {
             outb(self.pics[1].command, CMD_END_OF_INTERRUPT);
         }
         outb(self.pics[0].command, CMD_END_OF_INTERRUPT);
+
+        debug!("EOI send for IRQ: {}", irq);
     }
 }

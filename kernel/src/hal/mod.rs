@@ -6,6 +6,9 @@ pub fn init() {
 }
 
 pub fn halt_device() -> ! {
+    //unsafe {
+    //    core::arch::asm!("cli");
+    //}
     loop {
         unsafe {
             core::arch::asm!("hlt");

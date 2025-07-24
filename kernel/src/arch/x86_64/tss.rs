@@ -34,6 +34,7 @@ pub unsafe fn load_tss(sel: SegmentSelector) {
     }
 }
 
+#[repr(C, packed(4))]
 pub struct TaskStateSegment {
     _reserved_1: u32,
     pub privilege_stack_table: [VirtAddr; 3],

@@ -1,17 +1,18 @@
 #![no_std]
 #![no_main]
 
+use hexium::{debug, panic_log};
+
 #[unsafe(no_mangle)]
 unsafe extern "C" fn kmain() -> ! {
     hexium::hal::init();
     hexium::info!("Welcome to HexiumOS");
-    unsafe {
-        *(0xdeadbeef as *mut u8) = 42;
-    };
     hexium::hal::halt_device();
 }
 
 #[panic_handler]
-fn panic(_info: &core::panic::PanicInfo) -> ! {
+fn panic(info: &core::panic::PanicInfo) -> ! {
+    panic_log!("----- KERNEL PANIC -----");
+    panic_log!("{}", info);
     hexium::hal::halt_device();
 }

@@ -1,3 +1,4 @@
+use crate::arch::drivers::pic8259::InterruptIndex;
 use crate::arch::tss::DOUBLE_FAULT_IST_INDEX;
 use crate::{
     arch::{
@@ -22,7 +23,12 @@ lazy_static::lazy_static! {
     static ref IDT: InterruptDescriptorTable = {
         let mut idt = InterruptDescriptorTable::new();
         idt.breakpoint.set_handler_fn(breakpoint_handler);
-        unsafe {idt.double_fault.set_handler_fn(double_fault_handler).set_stack_index(DOUBLE_FAULT_IST_INDEX);}
+        unsafe {
+            idt.double_fault.set_handler_fn(double_fault_handler)
+                .set_stack_index(DOUBLE_FAULT_IST_INDEX);
+        }
+        idt.segment_not_present.set_handler_fn(segment_not_present_handler);
+        idt.interrupts[InterruptIndex::Timer.as_usize()].set_handler_fn(crate::arch::clock::pit::interrupt_handler);
         idt
     };
 }
@@ -285,4 +291,14 @@ extern "x86-interrupt" fn double_fault_handler(
     _error_code: u64,
 ) -> ! {
     panic!("EXCEPTION: DOUBLE FAULT\n{:#?}", stack_frame);
+}
+
+extern "x86-interrupt" fn segment_not_present_handler(
+    stack_frame: InterruptStackFrame,
+    error_code: u64,
+) {
+    panic!(
+        "EXCEPTION: SEGMENT NOT PRESENT\nError Code: {:#x}\n{:#?}",
+        error_code, stack_frame
+    );
 }

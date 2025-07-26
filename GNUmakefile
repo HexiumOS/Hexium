@@ -3,7 +3,7 @@ include tools/utils.mk
 $(call USER_VARIABLE, KARCH, x86_64)
 $(call USER_VARIABLE, QEMUFLAGS, -m 512M -M smm=off -serial stdio -d int -D qemu_log.log)
 
-override IMAGE_NAME := hexium_os-$(KARCH)
+override IMAGE_NAME := hexium-$(KARCH)
 
 .PHONY: all run kernel bootloader clean disclean
 

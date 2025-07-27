@@ -1,7 +1,7 @@
 include tools/utils.mk
 
 $(call USER_VARIABLE, KARCH, x86_64)
-$(call USER_VARIABLE, QEMUFLAGS, -m 512M -M smm=off -serial stdio -d int -D qemu_log.log)
+$(call USER_VARIABLE, QEMUFLAGS, -m 512M -M smm=off -serial stdio -d int -D qemu_log.log -no-reboot -no-shutdown)
 
 override IMAGE_NAME := hexium-$(KARCH)
 

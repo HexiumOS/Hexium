@@ -37,11 +37,11 @@ const ACCESS_RING3: u8 = 0x60;
 const ACCESS_PRESENT: u8 = 0x80;
 
 // Flags defined as consts to ensure const evaluation
-const FLAGS_BIT64: u8 = 0x20;
-const FLAGS_BIT32: u8 = 0x40;
-const FLAGS_BIT16: u8 = 0x00;
-const FLAGS_GRANULARITY_1B: u8 = 0x00;
-const FLAGS_GRANULARITY_4K: u8 = 0x80;
+const FLAG_BIT64: u8 = 0x20;
+const FLAG_BIT32: u8 = 0x40;
+const FLAG_BIT16: u8 = 0x00;
+const FLAG_GRANULARITY_1B: u8 = 0x00;
+const FLAG_GRANULARITY_4K: u8 = 0x80;
 
 // Helper functions
 const fn gdt_limit_low(limit: u32) -> u16 {
@@ -87,14 +87,14 @@ pub static GDT: Mutex<GlobalDescriptorTable> = Mutex::new(GlobalDescriptorTable 
             0,
             0xFFFF,
             ACCESS_PRESENT | ACCESS_RING0 | ACCESS_CODE_SEGMENT | ACCESS_CODE_READABLE,
-            FLAGS_BIT64 | FLAGS_GRANULARITY_4K
+            FLAG_BIT64 | FLAG_GRANULARITY_4K
         ),
         // Kernel 64-bit data segment
         gdt_entry!(
             0,
             0xFFFF,
             ACCESS_PRESENT | ACCESS_RING0 | ACCESS_DATA_SEGMENT | ACCESS_DATA_WRITEABLE,
-            FLAGS_GRANULARITY_4K
+            FLAG_GRANULARITY_4K
         ),
     ],
 });

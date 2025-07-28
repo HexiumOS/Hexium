@@ -119,22 +119,30 @@ pub fn load(gdt: &GlobalDescriptorTable, cs: u16, ds: u16) {
     unsafe {
         asm!(
             "lgdt [{0}]",
-            "mov ax, {1:x}",
-            "mov ds, ax",
-            "mov es, ax",
-            "mov fs, ax",
-            "mov gs, ax",
-            "mov ss, ax",
-            "push {2:x}",
-            "lea rax, [rip + 2f]",
-            "push rax",
-            "retfq",
-            "2:",
             in(reg) &gdt_ptr,
-            in(reg) ds,
-            in(reg) cs,
-            options(preserves_flags),
-            lateout("rax") _
+            options(nostack, preserves_flags),
         );
     }
+    crate::debug!("Loaded GDT");
+
+    unsafe {
+        asm!(
+            "mov ds, {0:e}",
+            "mov es, {0:e}",
+            "mov fs, {0:e}",
+            "mov gs, {0:e}",
+            "mov ss, {0:e}",
+            "push {1:r}",               // push CS
+            "lea {2:r}, [rip + 2f]",
+            "push {2:r}",               // push return address
+            "retfq",                    // far return
+            "2:",
+            in(reg) ds,
+            in(reg) cs,
+            lateout(reg) _,
+            options(preserves_flags),
+        );
+    }
+
+    crate::debug!("Updated segments");
 }

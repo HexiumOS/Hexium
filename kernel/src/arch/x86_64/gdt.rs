@@ -101,7 +101,6 @@ pub static GDT: Mutex<GlobalDescriptorTable> = Mutex::new(GlobalDescriptorTable 
 pub fn init() {
     let gdt = GDT.lock();
     load(&*gdt, 0x08, 0x10);
-    crate::trace!("Initialized GDT");
 }
 
 // Loads the GDT and update the code and data segments
@@ -120,31 +119,22 @@ pub fn load(gdt: &GlobalDescriptorTable, cs: u16, ds: u16) {
     unsafe {
         asm!(
             "lgdt [{0}]",
-            in(reg) &gdt_ptr,
-            options(nostack, preserves_flags),
-        );
-    }
-    crate::debug!("Loaded GDT");
-
-    unsafe {
-        asm!(
-            "mov ax, {0:x}",
+            "mov ax, {1:x}",
             "mov ds, ax",
             "mov es, ax",
             "mov fs, ax",
             "mov gs, ax",
             "mov ss, ax",
-            "push {1:x}",             // push CS
+            "push {2:x}",
             "lea rax, [rip + 2f]",
-            "push rax",               // push return address
-            "retfq",                  // far return
+            "push rax",
+            "retfq",
             "2:",
+            in(reg) &gdt_ptr,
             in(reg) ds,
             in(reg) cs,
-            lateout("rax") _,
             options(preserves_flags),
+            lateout("rax") _
         );
     }
-
-    crate::debug!("Updated segments");
 }

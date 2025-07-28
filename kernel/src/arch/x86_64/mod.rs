@@ -12,3 +12,9 @@ pub fn init() {
     gdt::init();
     interrupts::enable();
 }
+
+#[repr(C, packed)]
+struct DescriptorTablePointer {
+    limit: u16,
+    base: u64,
+}

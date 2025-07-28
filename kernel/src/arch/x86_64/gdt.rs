@@ -1,5 +1,6 @@
 #![allow(dead_code)]
 
+use crate::arch::x86_64::DescriptorTablePointer;
 use core::arch::asm;
 use core::mem::size_of;
 use spin::Mutex;
@@ -101,17 +102,12 @@ pub static GDT: Mutex<GlobalDescriptorTable> = Mutex::new(GlobalDescriptorTable 
 pub fn init() {
     let gdt = GDT.lock();
     load(&*gdt, 0x08, 0x10);
+    crate::trace!("Initialized GDT");
 }
 
 // Loads the GDT and update the code and data segments
 pub fn load(gdt: &GlobalDescriptorTable, cs: u16, ds: u16) {
-    #[repr(C, packed)]
-    struct DescriptorTablePointer {
-        limit: u16,
-        base: u64,
-    }
-
-    let gdt_ptr = DescriptorTablePointer {
+    let gdt_ptr: DescriptorTablePointer = DescriptorTablePointer {
         limit: gdt.limit,
         base: gdt.entries.as_ptr() as u64,
     };
@@ -144,5 +140,5 @@ pub fn load(gdt: &GlobalDescriptorTable, cs: u16, ds: u16) {
         );
     }
 
-    crate::debug!("Updated segments");
+    crate::debug!("Updated segments registers");
 }

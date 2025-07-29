@@ -17,3 +17,17 @@ pub fn option_to_c_void<T>(opt: Option<&mut T>) -> *mut c_void {
         reference as *mut T as *mut c_void
     })
 }
+
+#[macro_export]
+macro_rules! flag_set {
+    ($x:expr, $flag:expr) => {
+        $x |= $flag;
+    };
+}
+
+#[macro_export]
+macro_rules! flag_unset {
+    ($x:expr, $flag:expr) => {
+        $x &= !$flag;
+    };
+}

@@ -31,21 +31,6 @@ const _FLAG_RING3: u8 = 3 << 5;
 
 const FLAG_PRESENT: u8 = 0x80;
 
-pub fn set_gate(interrupt: usize, base: *const (), selector: u16, flags: u8) {
-    let base_addr = base as u64;
-    let mut idt = IDT.lock();
-
-    idt.entries[interrupt] = Entry {
-        base_low: (base_addr & 0xFFFF) as u16,
-        selector,
-        ist: 0,
-        type_attributes: flags,
-        base_middle: ((base_addr >> 16) & 0xFFFF) as u16,
-        base_high: (base_addr >> 32) as u32,
-        reserved: 0,
-    };
-}
-
 pub static IDT: Mutex<InterruptDescriptorTable> = Mutex::new(InterruptDescriptorTable {
     limit: (size_of::<[Entry; 256]>() - 1) as u16,
     entries: [Entry {

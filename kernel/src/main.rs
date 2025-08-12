@@ -13,10 +13,14 @@ unsafe extern "C" fn kmain() -> ! {
     //    let result = super_cool_symbol();
     //    hexium::println!("Result from super_cool_symbol: {}", result);
     //}
+    unsafe {
+        *(0xdeadbeef as *mut u8) = 42;
+    };
     hexium::hal::halt();
 }
 
 #[panic_handler]
-fn rust_panic(_info: &core::panic::PanicInfo) -> ! {
+fn rust_panic(info: &core::panic::PanicInfo) -> ! {
+    hexium::println!("{}", info);
     hexium::hal::halt();
 }

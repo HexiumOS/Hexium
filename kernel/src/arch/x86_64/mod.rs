@@ -1,12 +1,13 @@
 pub mod boot;
+pub mod debug;
 pub mod drivers;
+pub mod exceptions;
 pub mod gdt;
 pub mod idt;
 pub mod interrupts;
 pub mod memory;
 pub mod registers;
 pub mod writer;
-pub mod exceptions;
 
 pub fn init() {
     interrupts::disable();

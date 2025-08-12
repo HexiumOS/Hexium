@@ -1,18 +1,11 @@
 #![no_std]
 #![no_main]
-
-unsafe extern "C" {
-    fn super_cool_symbol() -> u64;
-}
-
 #[unsafe(no_mangle)]
 unsafe extern "C" fn kmain() -> ! {
     hexium::hal::init();
     hexium::info!("Welcome to HexiumOS");
-    //unsafe {
-    //    let result = super_cool_symbol();
-    //    hexium::println!("Result from super_cool_symbol: {}", result);
-    //}
+    // Hide the cursor
+    hexium::print!("\x1b[?25l");
     unsafe {
         *(0xdeadbeef as *mut u8) = 42;
     };
@@ -21,6 +14,5 @@ unsafe extern "C" fn kmain() -> ! {
 
 #[panic_handler]
 fn rust_panic(info: &core::panic::PanicInfo) -> ! {
-    hexium::println!("{}", info);
-    hexium::hal::halt();
+    hexium::panic::kpanic(info.message().as_str().unwrap_or_default(), 0, None);
 }

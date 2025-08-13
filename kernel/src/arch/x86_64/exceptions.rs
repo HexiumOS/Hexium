@@ -1,4 +1,4 @@
-use crate::{arch::idt::InterruptStackFrame, panic::kpanic};
+use crate::{arch::idt::InterruptStackFrame, hal::panic::kpanic};
 
 pub extern "x86-interrupt" fn double_fault_handler(
     stack_frame: InterruptStackFrame,

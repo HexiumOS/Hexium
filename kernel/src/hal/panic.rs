@@ -96,7 +96,7 @@ fn print_overview(message: &str, error_code: u64) {
             } else {
                 ""
             };
-            let faulting_address = unsafe { get_cr2() }; // Assume get_cr2() returns the CR2 register value
+            let faulting_address = get_cr2(); // Assume get_cr2() returns the CR2 register value
             println!(
                 "Details:    Caused by {} on {} in {}{}{}{}{}, faulting address: {:#x}",
                 present, write, user, reserved, instruction, protection_key, sgx, faulting_address

@@ -1,4 +1,5 @@
 pub mod log;
+pub mod panic;
 pub mod print;
 
 pub fn init() {

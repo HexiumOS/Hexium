@@ -9,5 +9,5 @@ unsafe extern "C" fn kmain() -> ! {
 
 #[panic_handler]
 fn rust_panic(info: &core::panic::PanicInfo) -> ! {
-    hexium::panic::kpanic(info.message().as_str().unwrap_or_default(), 0, None);
+    hexium::hal::panic::kpanic(info.message().as_str().unwrap_or_default(), 0, None);
 }

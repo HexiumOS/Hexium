@@ -3,5 +3,4 @@
 
 pub mod arch;
 pub mod hal;
-pub mod panic;
 pub mod util;

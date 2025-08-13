@@ -3,6 +3,14 @@ use core::arch::asm;
 pub mod rflags;
 
 #[inline]
+pub fn get_cr2() -> u64 {
+    let cr2: u64;
+    unsafe {
+        core::arch::asm!("mov {}, cr2", out(reg) cr2);
+    }
+    cr2
+}
+#[inline]
 pub fn get_cs() -> u16 {
     let segment: u16;
     unsafe {

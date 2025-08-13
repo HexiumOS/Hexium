@@ -6,3 +6,10 @@ pub extern "x86-interrupt" fn double_fault_handler(
 ) -> ! {
     kpanic("Double Fault", error_code, Some(stack_frame));
 }
+
+pub extern "x86-interrupt" fn page_fault_handler(
+    stack_frame: InterruptStackFrame,
+    error_code: u64,
+) {
+    kpanic("Page Fault", error_code, Some(stack_frame));
+}

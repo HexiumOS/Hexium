@@ -1,3 +1,4 @@
+use crate::arch::exceptions;
 use crate::arch::{
     PrivilegeLevel,
     registers::{get_cs, rflags::RFlags},
@@ -313,7 +314,8 @@ impl_handler_func_type!(DivergingHandlerFuncWithErrCode);
 lazy_static::lazy_static! {
     static ref IDT: InterruptDescriptorTable = {
         let mut idt = InterruptDescriptorTable::new();
-        idt.double_fault.set_handler_fn(crate::arch::exceptions::double_fault_handler);
+        idt.double_fault.set_handler_fn(exceptions::double_fault_handler);
+        idt.page_fault.set_handler_fn(exceptions::page_fault_handler);
         idt
     };
 }

@@ -5,7 +5,6 @@ pub mod exceptions;
 pub mod gdt;
 pub mod idt;
 pub mod interrupts;
-pub mod memory;
 pub mod registers;
 pub mod writer;
 

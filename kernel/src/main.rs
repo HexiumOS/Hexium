@@ -4,11 +4,6 @@
 unsafe extern "C" fn kmain() -> ! {
     hexium::hal::init();
     hexium::info!("Welcome to HexiumOS");
-    // Hide the cursor
-    hexium::print!("\x1b[?25l");
-    unsafe {
-        *(0xdeadbeef as *mut u8) = 42;
-    };
     hexium::hal::halt();
 }
 

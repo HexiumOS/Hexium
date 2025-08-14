@@ -6,6 +6,7 @@ pub mod exceptions;
 pub mod gdt;
 pub mod idt;
 pub mod interrupts;
+pub mod memory;
 pub mod registers;
 pub mod stdext;
 pub mod writer;
@@ -16,6 +17,7 @@ pub fn init() {
     writer::init();
     gdt::init();
     idt::init();
+    memory::pmm::init();
     interrupts::enable();
 }
 

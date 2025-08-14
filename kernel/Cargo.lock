@@ -30,6 +30,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "elf"
+version = "0.7.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4445909572dbd556c457c849c4ca58623d84b27c8fff1e74b0b4227d8b90d17b"
+
+[[package]]
 name = "flanterm"
 version = "0.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -44,9 +50,11 @@ version = "0.1.0"
 dependencies = [
  "bit_field",
  "bitflags",
+ "elf",
  "flanterm",
  "lazy_static",
  "limine",
+ "rustc-demangle",
  "spin 0.10.0",
 ]
 
@@ -77,6 +85,12 @@ dependencies = [
  "autocfg",
  "scopeguard",
 ]
+
+[[package]]
+name = "rustc-demangle"
+version = "0.1.26"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "56f7d92ca342cea22a06f2121d944b4fd82af56988c270852495420f961d4ace"
 
 [[package]]
 name = "scopeguard"

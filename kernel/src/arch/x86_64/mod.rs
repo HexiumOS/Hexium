@@ -1,3 +1,4 @@
+pub mod addr;
 pub mod boot;
 pub mod debug;
 pub mod drivers;
@@ -6,6 +7,7 @@ pub mod gdt;
 pub mod idt;
 pub mod interrupts;
 pub mod registers;
+pub mod stdext;
 pub mod writer;
 
 pub fn init() {

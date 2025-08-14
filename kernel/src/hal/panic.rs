@@ -1,4 +1,5 @@
-use crate::arch::debug::stacktrace::print_stacktrace;
+//use crate::arch::debug::stacktrace::print_stacktrace;
+use crate::arch::debug::stacktrace::stacktrace;
 use crate::arch::registers::*;
 use crate::{arch::idt::InterruptStackFrame, hal::halt, print, println};
 
@@ -26,7 +27,10 @@ pub fn kpanic(message: &str, error_code: u64, _stack_frame: Option<InterruptStac
     print_register_dump(&get_registers());
     println!();
     println!("Stacktrace:");
-    print_stacktrace();
+    //print_stacktrace();
+    stacktrace(|frame, addr, sym| {
+        println!("\t{frame:2}: {addr:p} @ {sym}");
+    });
 
     halt();
 }

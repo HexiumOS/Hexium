@@ -3,6 +3,13 @@ use core::fmt;
 #[repr(transparent)]
 pub struct VirtAddr(u64);
 
+#[derive(Clone, Copy)]
+#[repr(transparent)]
+pub struct PhysAddr(u64);
+
+pub struct VirtAddrNotValid(pub u64);
+pub struct PhysAddrNotValid(pub u64);
+
 impl VirtAddr {
     #[inline]
     pub const fn new(addr: u64) -> VirtAddr {
@@ -55,4 +62,33 @@ impl fmt::Pointer for VirtAddr {
     }
 }
 
-pub struct VirtAddrNotValid(pub u64);
+impl PhysAddr {
+    #[inline]
+    pub const fn new(addr: u64) -> Self {
+        // TODO: Replace with .ok().expect(msg) when that works on stable.
+        match Self::try_new(addr) {
+            Ok(p) => p,
+            Err(_) => panic!("physical addresses must not have any bits in the range 52 to 64 set"),
+        }
+    }
+
+    #[inline]
+    pub const fn try_new(addr: u64) -> Result<Self, PhysAddrNotValid> {
+        let p = Self::new_truncate(addr);
+        if p.0 == addr {
+            Ok(p)
+        } else {
+            Err(PhysAddrNotValid(addr))
+        }
+    }
+
+    #[inline]
+    pub const fn new_truncate(addr: u64) -> PhysAddr {
+        PhysAddr(addr % (1 << 52))
+    }
+
+    #[inline]
+    pub const fn as_u64(self) -> u64 {
+        self.0
+    }
+}

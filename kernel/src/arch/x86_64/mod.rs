@@ -17,7 +17,7 @@ pub fn init() {
     writer::init();
     gdt::init();
     idt::init();
-    memory::pmm::init();
+    //memory::pmm::init();
     interrupts::enable();
 }
 

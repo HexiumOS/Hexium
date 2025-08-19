@@ -1,12 +1,15 @@
-use crate::arch::{
-    addr::PhysAddr,
-    boot::{HHDM_REQUEST, MEMMAP_REQUEST},
-};
+use crate::arch::addr::PhysAddr;
 
 pub const FRAME_SIZE: u64 = 4096;
 
+pub fn create_bitmap_allocator() /* -> BitmapAllocator */
+{
+    // Find the frame count and bitmap size
+    // Create the bitmap with all frames used
+    // Free all usable frame entries
+}
+
 pub struct BitmapAllocator {
-    base_addr: PhysAddr,
     frame_count: usize,
     bitmap: &'static mut [u64],
 }
@@ -24,9 +27,7 @@ impl BitmapAllocator {
                             return None;
                         }
                         return Some(PhysFrame {
-                            start: PhysAddr::new(
-                                self.base_addr.as_u64() + (frame_idx as u64) * FRAME_SIZE,
-                            ),
+                            start: PhysAddr::new((frame_idx as u64) * FRAME_SIZE),
                         });
                     }
                 }
@@ -36,27 +37,30 @@ impl BitmapAllocator {
     }
 
     pub fn free(&mut self, frame: PhysFrame) {
-        let addr = frame.start_address();
-        if addr.as_u64() < self.base_addr.as_u64() {
-            panic!("Frame address below base");
-        }
-        let offset = addr.as_u64() - self.base_addr.as_u64();
-        if offset % FRAME_SIZE != 0 {
+        let addr = frame.start_address().as_u64();
+
+        if addr % FRAME_SIZE != 0 {
             panic!("Unaligned frame address");
         }
-        let frame_idx = (offset / FRAME_SIZE) as usize;
+
+        let frame_idx = (addr / FRAME_SIZE) as usize;
+
         if frame_idx >= self.frame_count {
             panic!("Frame index out of bounds");
         }
+
         let word_idx = frame_idx / 64;
         let bit_idx = (frame_idx % 64) as u32;
+
         if word_idx >= self.bitmap.len() {
             panic!("Bitmap index out of bounds");
         }
+
         let mask = 1u64 << bit_idx;
         if self.bitmap[word_idx] & mask == 0 {
             panic!("Frame already free");
         }
+
         self.bitmap[word_idx] &= !mask;
     }
 }

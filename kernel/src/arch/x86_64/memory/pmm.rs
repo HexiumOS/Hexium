@@ -1,11 +1,37 @@
-use crate::arch::addr::PhysAddr;
+use limine::memory_map::EntryType;
+
+use crate::{
+    arch::{addr::PhysAddr, boot::MEMMAP_REQUEST},
+    debug,
+};
 
 pub const FRAME_SIZE: u64 = 4096;
 
+pub fn init() {
+    create_bitmap_allocator();
+}
+
 pub fn create_bitmap_allocator() /* -> BitmapAllocator */
 {
+    let memmap = MEMMAP_REQUEST.get_response().unwrap();
+
     // Find the frame count and bitmap size
+    let mut high: u64 = 0;
+    for entry in memmap.entries() {
+        if entry.entry_type == EntryType::USABLE {
+            let top: u64 = entry.base + entry.length;
+            if top > high {
+                high = top;
+            }
+            debug!(
+                "Found usable memory region from: {:#x} to {:#x}",
+                entry.base, top
+            );
+        }
+    }
+
     // Create the bitmap with all frames used
+
     // Free all usable frame entries
 }
 

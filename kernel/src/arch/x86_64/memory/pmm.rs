@@ -29,40 +29,6 @@ pub fn create_bitmap_allocator() /* -> BitmapAllocator */
             );
         }
     }
-
-    let frame_count = (high / FRAME_SIZE) as usize;
-    let bitmap_bytes = (frame_count + 7) / 8;
-    let bitmap_words = (bitmap_bytes + 7) / 8;
-    let bitmap_size = bitmap_words * 8;
-
-    let mut bitmap_region_base = None;
-    for entry in memmap.entries() {
-        if entry.entry_type == EntryType::USABLE && entry.length >= bitmap_size as u64 {
-            bitmap_region_base = Some(entry.base);
-            break;
-        }
-    }
-    let bitmap_base = bitmap_region_base.expect("No suitable region for bitmap found");
-
-    let bitmap_slice = create_slice_mut(bitmap_base, bitmap_size);
-    let bitmap_ptr = bitmap_slice.as_mut_ptr() as *mut u64;
-    let bitmap = unsafe { core::slice::from_raw_parts_mut(bitmap_ptr, bitmap_words) };
-    for word in bitmap.iter_mut() {
-        *word = 0;
-    }
-
-    // Optionally, mark frames used by the bitmap itself as allocated in the bitmap
-    let bitmap_frame_count = (bitmap_size as u64 + FRAME_SIZE - 1) / FRAME_SIZE;
-    for i in 0..bitmap_frame_count {
-        let frame_idx = ((bitmap_base / FRAME_SIZE) + i) as usize;
-        if frame_idx < frame_count {
-            let word_idx = frame_idx / 64;
-            let bit_idx = frame_idx % 64;
-            bitmap[word_idx] |= 1u64 << bit_idx;
-        }
-    }
-
-    // Return or store the BitmapAllocator as needed
 }
 
 pub struct BitmapAllocator {

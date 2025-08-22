@@ -18,13 +18,13 @@ pub fn option_to_c_void<T>(opt: Option<&mut T>) -> *mut c_void {
     })
 }
 
-pub unsafe fn create_slice<'a>(addr: u64, len: usize) -> &'a [u8] {
-    let ptr = addr as *const u8;
+pub fn create_slice<'a, T>(addr: u64, len: usize) -> &'a [T] {
+    let ptr = addr as *const T;
     unsafe { slice::from_raw_parts(ptr, len) }
 }
 
-pub unsafe fn create_slice_mut<'a>(addr: u64, len: usize) -> &'a mut [u8] {
-    let ptr = addr as *mut u8;
+pub fn create_slice_mut<'a, T>(addr: u64, len: usize) -> &'a mut [T] {
+    let ptr = addr as *mut T;
     unsafe { slice::from_raw_parts_mut(ptr, len) }
 }
 

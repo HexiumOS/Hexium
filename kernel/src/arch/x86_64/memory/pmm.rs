@@ -3,20 +3,25 @@ use crate::{
         addr::PhysAddr,
         boot::{HHDM_REQUEST, MEMMAP_REQUEST},
     },
-    debug,
+    debug, trace,
 };
 use limine::memory_map::EntryType;
 
 pub const FRAME_SIZE: u64 = 4096;
 
+static mut BITMAP_ALLOCATOR: Option<BitmapAllocator> = None;
+
 pub fn init() {
-    create_bitmap_allocator();
+    unsafe {
+        BITMAP_ALLOCATOR = Some(create_bitmap_allocator());
+    }
 }
 
 pub fn create_bitmap_allocator() -> BitmapAllocator {
     let memmap = MEMMAP_REQUEST.get_response().unwrap();
     let hhdm = HHDM_REQUEST.get_response().unwrap().offset();
 
+    // Find the frame count and bitmap size
     let mut high: u64 = 0;
     for entry in memmap.entries() {
         if entry.entry_type == EntryType::USABLE {
@@ -31,10 +36,14 @@ pub fn create_bitmap_allocator() -> BitmapAllocator {
         }
     }
 
-    let frame_count = (high / FRAME_SIZE) as usize; // The number of frames
-    let bitmap_bytes = (frame_count + 7) / 8; // The number of bytes (not aligned to words)
-    let bitmap_words = (bitmap_bytes + 7) / 8; // The number of words
-    let bitmap_size = bitmap_words * 8; // The number of bytes (aligned to words)
+    let frame_count = (high / FRAME_SIZE) as usize;
+    let bitmap_size_bytes = (frame_count + 7) / 8; // Round up to nearest byte
+    let bitmap_size_u64s = (bitmap_size_bytes + 7) / 8; // Round up to nearest u64
+
+    debug!(
+        "Total frames: {}, bitmap size: {} bytes ({} u64s)",
+        frame_count, bitmap_size_bytes, bitmap_size_u64s
+    );
 
     // Find a suitable location for the bitmap
     // Look for the largest usable region that can fit our bitmap
@@ -42,7 +51,7 @@ pub fn create_bitmap_allocator() -> BitmapAllocator {
     let mut best_size = 0u64;
 
     for entry in memmap.entries() {
-        if entry.entry_type == EntryType::USABLE && entry.length >= bitmap_bytes as u64 {
+        if entry.entry_type == EntryType::USABLE && entry.length >= bitmap_size_bytes as u64 {
             if entry.length > best_size {
                 best_size = entry.length;
                 best_region = Some((entry.base, entry.length));
@@ -55,8 +64,8 @@ pub fn create_bitmap_allocator() -> BitmapAllocator {
     debug!("Placing bitmap at physical address: {:#x}", bitmap_base);
 
     // Create the bitmap slice from the chosen memory region
-    let bitmap_ptr = bitmap_base as *mut u64;
-    let bitmap = unsafe { core::slice::from_raw_parts_mut(bitmap_ptr, bitmap_words) };
+    let bitmap_ptr = (bitmap_base + hhdm) as *mut u64;
+    let bitmap = unsafe { core::slice::from_raw_parts_mut(bitmap_ptr, bitmap_size_u64s) };
 
     // Create the bitmap with all frames used (set all bits to 1)
     for word in bitmap.iter_mut() {
@@ -76,7 +85,7 @@ pub fn create_bitmap_allocator() -> BitmapAllocator {
 
                     if word_idx < bitmap.len() {
                         let mask = 1u64 << bit_idx;
-                        bitmap[word_idx] &= !mask; // Clear bit to mark as free
+                        bitmap[word_idx] &= !mask;
                     }
                 }
             }
@@ -87,7 +96,7 @@ pub fn create_bitmap_allocator() -> BitmapAllocator {
 
     // Mark the bitmap region itself as used to prevent allocation over it
     let bitmap_start_frame = bitmap_base / FRAME_SIZE;
-    let bitmap_end_frame = (bitmap_base + bitmap_bytes as u64 + FRAME_SIZE - 1) / FRAME_SIZE;
+    let bitmap_end_frame = (bitmap_base + bitmap_size_bytes as u64 + FRAME_SIZE - 1) / FRAME_SIZE;
 
     for frame_idx in bitmap_start_frame..bitmap_end_frame {
         if (frame_idx as usize) < frame_count {
@@ -104,6 +113,25 @@ pub fn create_bitmap_allocator() -> BitmapAllocator {
     debug!(
         "Marked bitmap region frames {:#x} to {:#x} as used",
         bitmap_start_frame, bitmap_end_frame
+    );
+
+    // Print memory information
+    let total_memory = frame_count as u64 * FRAME_SIZE;
+    let mut free_frames = 0usize;
+    for (_word_idx, word) in bitmap.iter().enumerate() {
+        let mut w = !*word;
+        while w != 0 {
+            free_frames += (w & 1) as usize;
+            w >>= 1;
+        }
+    }
+    let free_memory = free_frames as u64 * FRAME_SIZE;
+
+    trace!(
+        "Physical memory: total = {} MiB, free = {} MiB ({} frames free)",
+        total_memory / 1024 / 1024,
+        free_memory / 1024 / 1024,
+        free_frames
     );
 
     // Create the allocator after all bitmap initialization is complete
@@ -142,13 +170,11 @@ impl BitmapAllocator {
 
     pub fn free(&mut self, frame: PhysFrame) {
         let addr = frame.start_address().as_u64();
-
         if addr % FRAME_SIZE != 0 {
             panic!("Unaligned frame address");
         }
 
         let frame_idx = (addr / FRAME_SIZE) as usize;
-
         if frame_idx >= self.frame_count {
             panic!("Frame index out of bounds");
         }

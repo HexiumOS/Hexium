@@ -17,11 +17,17 @@ pub fn init() {
     }
 }
 
+/// The following function creates a bitmap allocator by doing to following:
+/// 1. Finds the frame count and calculates the size of the bitmap
+/// 2. Finds the region in the Limine MM and places the bitmap slice at the start of the region
+///     - This also sets all of the bits to used
+/// 3. Frees all of the usable memory regions from Limines memory map
+/// 4. Mark the bitmap region itself as used to prevent allocation over it
+/// 5. Print memory information (total mem, free mem and count of frames free)
 pub fn create_bitmap_allocator() -> BitmapAllocator {
     let memmap = MEMMAP_REQUEST.get_response().unwrap();
     let hhdm = HHDM_REQUEST.get_response().unwrap().offset();
 
-    // Find the frame count and bitmap size
     let mut high: u64 = 0;
     for entry in memmap.entries() {
         if entry.entry_type == EntryType::USABLE {
@@ -37,16 +43,14 @@ pub fn create_bitmap_allocator() -> BitmapAllocator {
     }
 
     let frame_count = (high / FRAME_SIZE) as usize;
-    let bitmap_size_bytes = (frame_count + 7) / 8; // Round up to nearest byte
-    let bitmap_size_u64s = (bitmap_size_bytes + 7) / 8; // Round up to nearest u64
+    let bitmap_size_bytes = (frame_count + 7) / 8;
+    let bitmap_size_u64s = (bitmap_size_bytes + 7) / 8;
 
     debug!(
         "Total frames: {}, bitmap size: {} bytes ({} u64s)",
         frame_count, bitmap_size_bytes, bitmap_size_u64s
     );
 
-    // Find a suitable location for the bitmap
-    // Look for the largest usable region that can fit our bitmap
     let mut best_region: Option<(u64, u64)> = None;
     let mut best_size = 0u64;
 
@@ -63,16 +67,14 @@ pub fn create_bitmap_allocator() -> BitmapAllocator {
 
     debug!("Placing bitmap at physical address: {:#x}", bitmap_base);
 
-    // Create the bitmap slice from the chosen memory region
+    // Create the bitmap slice from the chosen memory region with HHDM added to the base
     let bitmap_ptr = (bitmap_base + hhdm) as *mut u64;
     let bitmap = unsafe { core::slice::from_raw_parts_mut(bitmap_ptr, bitmap_size_u64s) };
 
-    // Create the bitmap with all frames used (set all bits to 1)
     for word in bitmap.iter_mut() {
         *word = u64::MAX;
     }
 
-    // Free all usable frame entries
     for entry in memmap.entries() {
         if entry.entry_type == EntryType::USABLE {
             let start_frame = entry.base / FRAME_SIZE;
@@ -94,7 +96,6 @@ pub fn create_bitmap_allocator() -> BitmapAllocator {
         }
     }
 
-    // Mark the bitmap region itself as used to prevent allocation over it
     let bitmap_start_frame = bitmap_base / FRAME_SIZE;
     let bitmap_end_frame = (bitmap_base + bitmap_size_bytes as u64 + FRAME_SIZE - 1) / FRAME_SIZE;
 
@@ -134,7 +135,6 @@ pub fn create_bitmap_allocator() -> BitmapAllocator {
         free_frames
     );
 
-    // Create the allocator after all bitmap initialization is complete
     BitmapAllocator {
         frame_count,
         bitmap,

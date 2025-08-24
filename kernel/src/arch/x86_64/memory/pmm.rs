@@ -106,7 +106,7 @@ pub fn create_bitmap_allocator() -> BitmapAllocator {
 
             if word_idx < bitmap.len() {
                 let mask = 1u64 << bit_idx;
-                bitmap[word_idx] |= mask; // Set bit to mark as used
+                bitmap[word_idx] |= mask;
             }
         }
     }

@@ -9,7 +9,7 @@ use limine::memory_map::EntryType;
 
 pub const FRAME_SIZE: u64 = 4096;
 
-static mut BITMAP_ALLOCATOR: Option<BitmapAllocator> = None;
+pub static mut BITMAP_ALLOCATOR: Option<BitmapAllocator> = None;
 
 pub fn init() {
     unsafe {

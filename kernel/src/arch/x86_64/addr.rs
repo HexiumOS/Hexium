@@ -3,7 +3,7 @@ use core::fmt;
 #[repr(transparent)]
 pub struct VirtAddr(u64);
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 #[repr(transparent)]
 pub struct PhysAddr(u64);
 

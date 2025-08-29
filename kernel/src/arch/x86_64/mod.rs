@@ -18,6 +18,7 @@ pub fn init() {
     gdt::init();
     idt::init();
     memory::pmm::init();
+    memory::heap::init();
     interrupts::enable();
 }
 

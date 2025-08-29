@@ -17,6 +17,24 @@ pub fn init() {
     }
 }
 
+#[allow(static_mut_refs)]
+pub fn alloc() -> Option<PhysFrame> {
+    let allocator = unsafe { BITMAP_ALLOCATOR.as_mut().unwrap() };
+    allocator.alloc()
+}
+
+#[allow(static_mut_refs)]
+pub fn alloc_contiguous(count: &usize) -> Option<PhysFrame> {
+    let allocator = unsafe { BITMAP_ALLOCATOR.as_mut().unwrap() };
+    allocator.alloc_contiguous(*count)
+}
+
+#[allow(static_mut_refs)]
+pub fn free(frame: PhysFrame) {
+    let allocator = unsafe { BITMAP_ALLOCATOR.as_mut().unwrap() };
+    allocator.free(frame)
+}
+
 /// The following function creates a bitmap allocator by doing to following:
 /// 1. Finds the frame count and calculates the size of the bitmap
 /// 2. Finds the region in the Limine MM and places the bitmap slice at the start of the region
@@ -165,6 +183,44 @@ impl BitmapAllocator {
                 }
             }
         }
+        None
+    }
+
+    pub fn alloc_contiguous(&mut self, count: usize) -> Option<PhysFrame> {
+        if count == 0 {
+            return None;
+        }
+
+        let mut run_start: usize = 0;
+        let mut run_length: usize = 0;
+
+        for frame_idx in 0..self.frame_count {
+            let word_idx = frame_idx / 64;
+            let bit_idx = frame_idx % 64;
+            let mask: u64 = 1 << bit_idx;
+
+            if self.bitmap[word_idx] & mask == 0 {
+                if run_length == 0 {
+                    run_start = frame_idx;
+                }
+                run_length += 1;
+
+                if run_length == count {
+                    for i in run_start..run_length + count {
+                        let w = i / 64;
+                        let b = i % 64;
+                        self.bitmap[w] |= 1 << b;
+                    }
+
+                    return Some(PhysFrame {
+                        start: PhysAddr::new((run_start as u64) * FRAME_SIZE),
+                    });
+                }
+            } else {
+                run_length = 0;
+            }
+        }
+
         None
     }
 

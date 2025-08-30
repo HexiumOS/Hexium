@@ -2,3 +2,6 @@
 	path = limine
 	url = https://github.com/limine-bootloader/limine.git
 	branch = v9.x-binary
+[submodule "docs"]
+	path = docs
+	url = https://github.com/HexiumOS/Documentation.git

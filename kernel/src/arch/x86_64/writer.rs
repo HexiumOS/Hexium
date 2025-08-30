@@ -1,6 +1,6 @@
 use crate::util::option_to_c_void;
 use core::{fmt, ptr};
-use spin::Mutex;
+use spin::{Lazy, Mutex};
 
 pub struct FlantermContext(pub *mut flanterm::sys::flanterm_context);
 unsafe impl Send for FlantermContext {}
@@ -45,11 +45,9 @@ pub fn init() {
     crate::trace!("Initialized Flanterm context");
 }
 
-lazy_static::lazy_static! {
-    pub static ref FLANTERM_CTX: Mutex<FlantermContext> =
-        Mutex::new(FlantermContext(ptr::null_mut()));
-    pub static ref WRITER: Mutex<FlantermWriter> = Mutex::new(FlantermWriter {});
-}
+pub static FLANTERM_CTX: Lazy<Mutex<FlantermContext>> =
+    Lazy::new(|| Mutex::new(FlantermContext(ptr::null_mut())));
+pub static WRITER: Lazy<Mutex<FlantermWriter>> = Lazy::new(|| Mutex::new(FlantermWriter {}));
 
 pub struct FlantermWriter {}
 

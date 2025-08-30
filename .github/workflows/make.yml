@@ -1,3 +1,5 @@
+name: Makefile CI
+
 on:
   push:
     branches: [ "nightly" ]
@@ -43,5 +45,5 @@ jobs:
 
     - uses: actions/upload-artifact@v4
       with:
-        name: 'image artifact'
+        name: 'hexium.iso'
         path: 'hexium-x86_64.iso'

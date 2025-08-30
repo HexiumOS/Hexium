@@ -21,6 +21,9 @@ jobs:
         target: x86_64-unknown-none
         components: rust-src
 
+    - name: Add rust-src
+      run: rustup component add rust-src --toolchain nightly-2025-04-03-x86_64-unknown-linux-gnu
+
     - name: Update Debian repositories
       run: sudo apt-get update
 

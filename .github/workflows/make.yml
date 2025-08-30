@@ -22,7 +22,7 @@ jobs:
         components: rust-src
 
     - name: Update Debian repositories
-    - run: sudo apt-get update
+      run: sudo apt-get update
 
     - name: Setup nasm
       run: sudo apt-get install -y nasm

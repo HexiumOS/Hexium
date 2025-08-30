@@ -9,6 +9,7 @@ use core::{
     marker::PhantomData,
     ops::{Index, IndexMut},
 };
+use spin::Lazy;
 
 #[allow(dead_code)]
 #[repr(C, align(16))]
@@ -311,14 +312,14 @@ impl_handler_func_type!(HandlerFuncWithErrCode);
 impl_handler_func_type!(DivergingHandlerFunc);
 impl_handler_func_type!(DivergingHandlerFuncWithErrCode);
 
-lazy_static::lazy_static! {
-    static ref IDT: InterruptDescriptorTable = {
-        let mut idt = InterruptDescriptorTable::new();
-        idt.double_fault.set_handler_fn(exceptions::double_fault_handler);
-        idt.page_fault.set_handler_fn(exceptions::page_fault_handler);
-        idt
-    };
-}
+static IDT: Lazy<InterruptDescriptorTable> = Lazy::new(|| {
+    let mut idt = InterruptDescriptorTable::new();
+    idt.double_fault
+        .set_handler_fn(exceptions::double_fault_handler);
+    idt.page_fault
+        .set_handler_fn(exceptions::page_fault_handler);
+    idt
+});
 
 pub fn init() {
     IDT.load();

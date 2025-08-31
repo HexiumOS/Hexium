@@ -1,4 +1,4 @@
-#Hexium OS 
+# Hexium OS 
 
 Welcome to **Hexium OS**, an experimental operating system written from scratch in Rust. This project explores the powerful capabilities of Rust for low-level systems programming and serves as a modern platform for learning, experimentation, and innovation. Whether you're an experienced systems developer or just curious about how operating systems work, you've come to the right place!
 

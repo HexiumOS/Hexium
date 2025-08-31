@@ -32,7 +32,7 @@ Close the QEMU window to shut down.
 ## 📋 Prerequisites
 
 Before building, you'll need to set up your environment (Rust nightly, build tools, and QEMU).  
-See the full [`PREREQUISITES`](PREREQUISITES.md) guide.
+See the full [`PREREQUISITES`](PREREQUISITE.md) guide.
 
 ---
 

@@ -21,3 +21,7 @@ GitHub usernames are listed in parentheses, and email addresses are shown in ang
 - Viktor Popp (viktorpopp) <viktorpopp.dev@gmail.com>
 - The Douck (thedouck) <thedouckdev@gmail.com>
 - Ryan Koech (ryenkoech) <sirryankoech@gmail.com>
+
+## Special thanks for General Improvements
+
+- Devanshu Sharma [`GITHUB`](https://github.com/SharmaDevanshu089/)

@@ -41,8 +41,6 @@ pub fn init() {
             });
         }
     }
-
-    crate::trace!("Initialized Flanterm context");
 }
 
 pub static FLANTERM_CTX: Lazy<Mutex<FlantermContext>> =

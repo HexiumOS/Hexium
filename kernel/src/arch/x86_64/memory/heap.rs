@@ -33,7 +33,7 @@ pub fn init() {
     }
 
     trace!(
-        "Initialized heap memory at {:#x} with size of {:#x}",
+        "Heap initalized at {:#010x} (size {:#010x})",
         allocator_frame.unwrap().start_address().as_u64(),
         allocator_size
     );

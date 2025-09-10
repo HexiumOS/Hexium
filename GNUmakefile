@@ -82,6 +82,12 @@ ovmf/ovmf-vars-$(KARCH).fd:
 	curl -Lo $@ https://github.com/osdev0/edk2-ovmf-nightly/releases/latest/download/ovmf-vars-$(KARCH).fd
 
 #
+# Download the docs
+#
+docs:
+	git clone https://github.com/HexiumOS/Documentation.git
+
+#
 # Build the bootloader (Limine)
 #
 bootloader:

@@ -99,13 +99,14 @@ pub static GDT: Mutex<GlobalDescriptorTable> = Mutex::new(GlobalDescriptorTable 
     ],
 });
 
-pub fn init() {
+pub fn init() -> (u64, u8) {
     let gdt = GDT.lock();
-    load(&*gdt, 0x08, 0x10);
+    load(&*gdt, 0x08, 0x10)
 }
 
-// Loads the GDT and update the code and data segments
-pub fn load(gdt: &GlobalDescriptorTable, cs: u16, ds: u16) {
+/// Loads the GDT and update the code and data segments
+/// Returns a tuple containing loaded address and amount of entries
+pub fn load(gdt: &GlobalDescriptorTable, cs: u16, ds: u16) -> (u64, u8) {
     let gdt_ptr: DescriptorTablePointer = DescriptorTablePointer {
         limit: gdt.limit,
         base: gdt.entries.as_ptr() as u64,
@@ -137,4 +138,6 @@ pub fn load(gdt: &GlobalDescriptorTable, cs: u16, ds: u16) {
             options(preserves_flags),
         );
     }
+
+    (gdt.entries.as_ptr() as u64, gdt.entries.len() as u8)
 }

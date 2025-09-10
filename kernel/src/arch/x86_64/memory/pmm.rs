@@ -63,8 +63,8 @@ pub fn create_bitmap_allocator() -> BitmapAllocator {
     let bitmap_size_bytes = (frame_count + 7) / 8;
     let bitmap_size_u64s = (bitmap_size_bytes + 7) / 8;
 
-    trace!("Total frames: {}", frame_count);
-    trace!(
+    debug!("Total frames: {}", frame_count);
+    debug!(
         "Bitmap size: {} ({} u64s)",
         bitmap_size_bytes, bitmap_size_u64s
     );
@@ -83,7 +83,7 @@ pub fn create_bitmap_allocator() -> BitmapAllocator {
 
     let (bitmap_base, _) = best_region.expect("No suitable memory region found for bitmap");
 
-    trace!("Bitmap placed at: {:#010x}", bitmap_base);
+    debug!("Bitmap placed at: {:#010x}", bitmap_base);
 
     // Create the bitmap slice from the chosen memory region with HHDM added to the base
     let bitmap_ptr = (bitmap_base + hhdm) as *mut u64;
@@ -129,11 +129,6 @@ pub fn create_bitmap_allocator() -> BitmapAllocator {
         }
     }
 
-    trace!(
-        "Reserved bitmap region: {:#x} - {:#x}",
-        bitmap_start_frame, bitmap_end_frame
-    );
-
     // Print memory information
     let total_memory = frame_count as u64 * FRAME_SIZE;
     let mut free_frames = 0usize;
@@ -146,11 +141,10 @@ pub fn create_bitmap_allocator() -> BitmapAllocator {
     }
     let free_memory = free_frames as u64 * FRAME_SIZE;
 
-    trace!(
-        "Physical memory: total = {} MiB, free = {} MiB ({} frames)",
+    info!(
+        "Total memory: {} MiB, usable: {} MiB",
         total_memory / 1024 / 1024,
         free_memory / 1024 / 1024,
-        free_frames
     );
 
     BitmapAllocator {

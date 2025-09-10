@@ -3,7 +3,7 @@ use crate::{
         addr::PhysAddr,
         boot::{HHDM_REQUEST, MEMMAP_REQUEST},
     },
-    debug, info, println, trace,
+    debug, info, println,
 };
 use limine::memory_map::EntryType;
 

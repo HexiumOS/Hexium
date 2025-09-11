@@ -3,7 +3,7 @@ use crate::{
         boot::HHDM_REQUEST,
         memory::pmm::{FRAME_SIZE, alloc_contiguous},
     },
-    trace,
+    info,
 };
 use core::{mem::MaybeUninit, slice};
 use talc::{ErrOnOom, Talc, Talck};
@@ -32,8 +32,8 @@ pub fn init() {
         unsafe { talc.claim(span) }.unwrap();
     }
 
-    trace!(
-        "Initialized heap memory at {:#x} with size of {:#x}",
+    info!(
+        "Heap initalized at {:#010x} (size {:#010x})",
         allocator_frame.unwrap().start_address().as_u64(),
         allocator_size
     );

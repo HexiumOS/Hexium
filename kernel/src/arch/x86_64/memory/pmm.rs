@@ -3,7 +3,7 @@ use crate::{
         addr::PhysAddr,
         boot::{HHDM_REQUEST, MEMMAP_REQUEST},
     },
-    debug, trace,
+    debug, info, println,
 };
 use limine::memory_map::EntryType;
 
@@ -46,6 +46,8 @@ pub fn create_bitmap_allocator() -> BitmapAllocator {
     let memmap = MEMMAP_REQUEST.get_response().unwrap();
     let hhdm = HHDM_REQUEST.get_response().unwrap().offset();
 
+    info!("Detecting physical memory");
+    debug!("Usable memory regions:");
     let mut high: u64 = 0;
     for entry in memmap.entries() {
         if entry.entry_type == EntryType::USABLE {
@@ -53,10 +55,7 @@ pub fn create_bitmap_allocator() -> BitmapAllocator {
             if top > high {
                 high = top;
             }
-            debug!(
-                "Found usable memory region from: {:#x} to {:#x}",
-                entry.base, top
-            );
+            println!("        {:#010x} - {:#010x}", entry.base, top);
         }
     }
 
@@ -64,9 +63,10 @@ pub fn create_bitmap_allocator() -> BitmapAllocator {
     let bitmap_size_bytes = (frame_count + 7) / 8;
     let bitmap_size_u64s = (bitmap_size_bytes + 7) / 8;
 
-    trace!(
-        "Total frames: {}, bitmap size: {} bytes ({} u64s)",
-        frame_count, bitmap_size_bytes, bitmap_size_u64s
+    debug!("Total frames: {}", frame_count);
+    debug!(
+        "Bitmap size: {} ({} u64s)",
+        bitmap_size_bytes, bitmap_size_u64s
     );
 
     let mut best_region: Option<(u64, u64)> = None;
@@ -83,7 +83,7 @@ pub fn create_bitmap_allocator() -> BitmapAllocator {
 
     let (bitmap_base, _) = best_region.expect("No suitable memory region found for bitmap");
 
-    trace!("Placing bitmap at physical address: {:#x}", bitmap_base);
+    debug!("Bitmap placed at: {:#010x}", bitmap_base);
 
     // Create the bitmap slice from the chosen memory region with HHDM added to the base
     let bitmap_ptr = (bitmap_base + hhdm) as *mut u64;
@@ -109,10 +109,10 @@ pub fn create_bitmap_allocator() -> BitmapAllocator {
                     }
                 }
             }
-
-            debug!("Freed frames {:#x} to {:#x}", start_frame, end_frame);
         }
     }
+
+    debug!("Freed frames in usable ranges");
 
     let bitmap_start_frame = bitmap_base / FRAME_SIZE;
     let bitmap_end_frame = (bitmap_base + bitmap_size_bytes as u64 + FRAME_SIZE - 1) / FRAME_SIZE;
@@ -129,11 +129,6 @@ pub fn create_bitmap_allocator() -> BitmapAllocator {
         }
     }
 
-    trace!(
-        "Marked bitmap region frames {:#x} to {:#x} as used",
-        bitmap_start_frame, bitmap_end_frame
-    );
-
     // Print memory information
     let total_memory = frame_count as u64 * FRAME_SIZE;
     let mut free_frames = 0usize;
@@ -146,11 +141,10 @@ pub fn create_bitmap_allocator() -> BitmapAllocator {
     }
     let free_memory = free_frames as u64 * FRAME_SIZE;
 
-    trace!(
-        "Physical memory: total = {} MiB, free = {} MiB ({} frames free)",
+    info!(
+        "Total memory: {} MiB, usable: {} MiB",
         total_memory / 1024 / 1024,
         free_memory / 1024 / 1024,
-        free_frames
     );
 
     BitmapAllocator {

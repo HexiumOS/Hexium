@@ -11,17 +11,6 @@ pub mod registers;
 pub mod stdext;
 pub mod writer;
 
-pub fn init() {
-    interrupts::disable();
-    assert!(boot::BASE_REVISION.is_supported());
-    writer::init();
-    gdt::init();
-    idt::init();
-    memory::pmm::init();
-    memory::heap::init();
-    interrupts::enable();
-}
-
 #[repr(C, packed)]
 struct DescriptorTablePointer {
     limit: u16,
